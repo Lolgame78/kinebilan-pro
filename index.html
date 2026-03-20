@@ -2173,8 +2173,9 @@ function filterTests(tag, btn) {
 }
 
 function renderTestCard(t) {
+  const safeName = t.name.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
   return `
-    <div class="test-lib-card" onclick="openTestModal(${JSON.stringify(t.name).replace(/'/g, '\\'')})">
+    <div class="test-lib-card" onclick="openTestModal('${safeName}')">
       <div class="test-lib-tag tag-${t.tag}">${t.tagLabel}</div>
       <div class="test-lib-name">${t.name}</div>
       <div class="test-lib-desc">${t.desc}</div>
@@ -2184,6 +2185,7 @@ function renderTestCard(t) {
 }
 
 function openTestModal(name) {
+  name = name.replace(/&#39;/g, "'").replace(/&quot;/g, '"');
   const t = TESTS_DATA.find(t => t.name === name);
   if (!t) return;
   const modal = document.createElement('div');
