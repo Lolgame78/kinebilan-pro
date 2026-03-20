@@ -1800,9 +1800,9 @@ function renderStep5() {
             </div>` : ''}
           </div>
           ${b.bodyChartData ? `
-          <div style="flex-shrink:0;">
+          <div style="flex-shrink:0;break-inside:avoid;page-break-inside:avoid;">
             <div style="font-size:10px;font-weight:600;color:var(--ink3);margin-bottom:4px;text-transform:uppercase;">Cartographie</div>
-            <div style="position:relative;width:140px;height:105px;border:1px solid #e2e0da;border-radius:6px;overflow:hidden;background:#fafaf9;">
+            <div style="position:relative;width:120px;height:90px;border:1px solid #e2e0da;border-radius:6px;overflow:hidden;background:#fafaf9;">
               ${b.bodyChartBg ? `<img src="${b.bodyChartBg}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:.45;">` : ''}
               <img src="${b.bodyChartData}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;">
             </div>
@@ -1863,9 +1863,9 @@ function renderStep5() {
           <h3 style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:14px;">Annexes — Grilles d'évaluation</h3>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
             ${b.visualTests.map(t => `
-              <div class="no-break">
+              <div class="no-break" style="break-inside:avoid;page-break-inside:avoid;">
                 <p style="font-weight:600;margin-bottom:6px;font-size:12px;color:var(--ink2);">${esc(t.name)}</p>
-                <div style="position:relative;width:100%;aspect-ratio:3/4;border:1px solid #e2e0da;border-radius:6px;overflow:hidden;background:#fafaf9;max-height:220px;">
+                <div style="position:relative;width:160px;height:200px;border:1px solid #e2e0da;border-radius:6px;overflow:hidden;background:#fafaf9;">
                   ${t.bgImage ? `<img src="${t.bgImage}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:.65;">` : ''}
                   ${t.drawData ? `<img src="${t.drawData}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;">` : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:11px;">Espace vierge</div>'}
                 </div>
