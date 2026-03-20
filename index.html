@@ -713,6 +713,18 @@ input[type="range"]::-webkit-slider-thumb {
   max-width: 780px;
 }
 
+[contenteditable].is-empty::before {
+  content: attr(data-placeholder);
+  color: var(--ink3);
+  pointer-events: none;
+  font-style: italic;
+}
+
+[contenteditable]:focus {
+  outline: none;
+  border-bottom-color: var(--accent-border) !important;
+}
+
 /* ===== EMPTY STATE ===== */
 .empty-state {
   text-align: center;
@@ -1706,11 +1718,24 @@ function renderStep5() {
   const b = currentBilan;
   const dateStr = new Date(b.date).toLocaleDateString('fr-FR');
   return `
+    <style>
+      @media print {
+        @page { margin: 15mm 15mm 15mm 15mm; size: A4; }
+        body * { visibility: hidden; }
+        #bilan-print-area, #bilan-print-area * { visibility: visible; }
+        #bilan-print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0 !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; }
+        .print-hide { display: none !important; }
+        .no-break { break-inside: avoid; page-break-inside: avoid; }
+        section { break-inside: avoid; page-break-inside: avoid; }
+        h3 { break-after: avoid; page-break-after: avoid; }
+      }
+    </style>
+
     <div class="card print-hide" style="margin-bottom:16px;">
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button class="btn btn-ghost" onclick="window.print()">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-          Imprimer
+          Imprimer / PDF
         </button>
         <button class="btn btn-ghost" onclick="exportBilan()">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
@@ -1721,89 +1746,128 @@ function renderStep5() {
           Générer courrier
         </button>
       </div>
+      <p style="margin-top:10px;font-size:12px;color:var(--ink3);">💡 Pour exporter en PDF : cliquez "Imprimer / PDF" puis choisissez "Enregistrer en PDF" comme imprimante.</p>
     </div>
 
-    <div id="bilan-print-area" style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:40px;font-family:var(--font-sans);">
-      <div style="border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom:24px;">
-        <h1 style="font-family:var(--font-serif);font-size:26px;font-weight:400;margin-bottom:6px;">Bilan Diagnostic Kinésithérapique</h1>
-        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--ink2);">
-          <span>Patient : <strong>${esc(b.patientName) || 'Non renseigné'}</strong>${b.age ? ` (${b.age} ans)` : ''}</span>
-          <span>${dateStr}</span>
+    <div id="bilan-print-area" style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:32px 36px;font-family:var(--font-sans);font-size:13px;line-height:1.5;">
+
+      <!-- EN-TÊTE -->
+      <div class="no-break" style="border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+          <div>
+            <h1 style="font-family:var(--font-serif);font-size:22px;font-weight:400;margin-bottom:3px;">Bilan Diagnostic Kinésithérapique</h1>
+            <div style="font-size:13px;color:var(--ink2);">
+              Patient : <strong>${esc(b.patientName) || 'Non renseigné'}</strong>${b.age ? ` · ${b.age} ans` : ''}
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--ink3);text-align:right;">${dateStr}</div>
         </div>
       </div>
 
-      <section style="margin-bottom:20px;">
-        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:10px;">1. Motif & Objectifs</h3>
-        <p style="margin-bottom:10px;"><strong>Motif :</strong> ${esc(b.motif) || '—'}</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;background:var(--surface2);padding:14px;border-radius:var(--radius-sm);">
-          <div><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px;">COURT TERME</div>${esc(b.objectifsCT) || '—'}</div>
-          <div><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px;">MOYEN TERME</div>${esc(b.objectifsMT) || '—'}</div>
-          <div><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px;">LONG TERME</div>${esc(b.objectifsLT) || '—'}</div>
+      <!-- SECTION 1 : MOTIF & OBJECTIFS -->
+      <section class="no-break" style="margin-bottom:16px;">
+        <h3 style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:4px;">1. Motif & Objectifs</h3>
+        <p style="margin-bottom:8px;"><strong>Motif :</strong> ${esc(b.motif) || '—'}</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:12px;">
+          <div style="background:#f8f7f4;padding:10px;border-radius:6px;border-top:2px solid var(--accent);">
+            <div style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:3px;text-transform:uppercase;">Court terme</div>
+            <div>${esc(b.objectifsCT) || '—'}</div>
+          </div>
+          <div style="background:#f8f7f4;padding:10px;border-radius:6px;border-top:2px solid var(--accent);">
+            <div style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:3px;text-transform:uppercase;">Moyen terme</div>
+            <div>${esc(b.objectifsMT) || '—'}</div>
+          </div>
+          <div style="background:#f8f7f4;padding:10px;border-radius:6px;border-top:2px solid var(--accent);">
+            <div style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:3px;text-transform:uppercase;">Long terme</div>
+            <div>${esc(b.objectifsLT) || '—'}</div>
+          </div>
         </div>
-        ${b.dureeReeval ? `<p style="margin-top:10px;font-size:13px;"><em>Réévaluation : ${esc(b.dureeReeval)}</em></p>` : ''}
+        ${b.dureeReeval ? `<p style="margin-top:6px;font-size:12px;color:var(--ink3);"><em>Réévaluation : ${esc(b.dureeReeval)}</em></p>` : ''}
       </section>
 
-      <section style="margin-bottom:20px;">
-        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:10px;">2. Sémiologie</h3>
-        <p><strong>Type :</strong> ${esc(b.douleurType) || '—'} &nbsp;·&nbsp; <strong>EVA :</strong> <span style="color:var(--red);font-weight:700;">${b.eva}/10</span></p>
-        ${b.bodyChartData ? `
-          <div style="margin-top:12px;">
-            <div style="position:relative;width:220px;aspect-ratio:4/3;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:#fafaf9;">
+      <!-- SECTION 2 : SÉMIOLOGIE — body chart en ligne à droite pour ne pas casser la page -->
+      <section class="no-break" style="margin-bottom:16px;">
+        <h3 style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:4px;">2. Sémiologie</h3>
+        <div style="display:flex;gap:20px;align-items:flex-start;">
+          <div style="flex:1;">
+            <p><strong>Type :</strong> ${esc(b.douleurType) || '—'}</p>
+            <p style="margin-top:4px;"><strong>Intensité :</strong> <span style="color:var(--red);font-weight:700;">EVA ${b.eva}/10</span></p>
+            ${(b.redFlag1 || b.redFlag2 || b.yellowFlags) ? `
+            <div style="margin-top:8px;padding:8px 10px;background:#fef2f2;border-left:3px solid #dc2626;border-radius:0 4px 4px 0;font-size:12px;">
+              ${b.redFlag1 ? `<div style="color:#991b1b;">🚩 Anamnèse : ${esc(b.redFlag1Details) || 'oui'}</div>` : ''}
+              ${b.redFlag2 ? `<div style="color:#991b1b;">🚩 Clinique : ${esc(b.redFlag2Details) || 'oui'}</div>` : ''}
+              ${b.yellowFlags ? `<div style="color:#92400e;margin-top:2px;">🔸 BPS : ${esc(b.yellowFlags)}</div>` : ''}
+            </div>` : ''}
+          </div>
+          ${b.bodyChartData ? `
+          <div style="flex-shrink:0;">
+            <div style="font-size:10px;font-weight:600;color:var(--ink3);margin-bottom:4px;text-transform:uppercase;">Cartographie</div>
+            <div style="position:relative;width:140px;height:105px;border:1px solid #e2e0da;border-radius:6px;overflow:hidden;background:#fafaf9;">
               ${b.bodyChartBg ? `<img src="${b.bodyChartBg}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:.45;">` : ''}
               <img src="${b.bodyChartData}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;">
             </div>
           </div>` : ''}
-      </section>
-
-      ${(b.redFlag1 || b.redFlag2 || b.yellowFlags) ? `
-      <section style="margin-bottom:20px;padding:14px;background:var(--red-light);border:1px solid var(--red-border);border-radius:var(--radius-sm);">
-        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#991b1b;margin-bottom:8px;">Drapeaux</h3>
-        ${b.redFlag1 ? `<p style="color:#991b1b;">🚩 Anamnèse : ${esc(b.redFlag1Details) || 'oui'}</p>` : ''}
-        ${b.redFlag2 ? `<p style="color:#991b1b;">🚩 Clinique : ${esc(b.redFlag2Details) || 'oui'}</p>` : ''}
-        ${b.yellowFlags ? `<p style="color:#92400e;">🔸 BPS : ${esc(b.yellowFlags)}</p>` : ''}
-      </section>` : ''}
-
-      <section style="margin-bottom:20px;">
-        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:10px;">3. Hypothèse diagnostique</h3>
-        <p style="background:var(--accent-light);padding:12px;border-radius:var(--radius-sm);border-left:3px solid var(--accent);">${esc(b.hypothesePrincipale) || 'Non formulée'}</p>
-        ${b.diagnosticsDifferentiels ? `<p style="margin-top:8px;font-size:13px;color:var(--ink2);"><em>DD : ${esc(b.diagnosticsDifferentiels)}</em></p>` : ''}
-      </section>
-
-      <section style="margin-bottom:20px;">
-        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:10px;">4. Examen clinique</h3>
-        <div style="background:var(--surface2);padding:14px;border-radius:var(--radius-sm);display:grid;gap:8px;font-size:14px;">
-          <p><strong>Observation :</strong> ${esc(b.observation) || '—'}</p>
-          <p><strong>Articulaire/Musculaire :</strong> ${esc(b.bilanArticulaire) || '—'}</p>
-          <p><strong>Neurologique :</strong> ${esc(b.bilanNeuro) || '—'}</p>
-          ${b.testsSpecifiques ? `<p><strong>Tests :</strong> ${esc(b.testsSpecifiques)}</p>` : ''}
         </div>
       </section>
 
-      <section>
-        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:10px;">5. Conclusion</h3>
-        ${b.hypotheseConfirmee === true ? `
-          <div style="background:var(--green-light);border:1px solid #bbf7d0;border-radius:var(--radius-sm);padding:16px;">
-            <p style="font-weight:700;color:var(--green);margin-bottom:8px;">✅ Hypothèse confirmée</p>
-            <p style="white-space:pre-wrap;">${esc(b.planTraitement) || '—'}</p>
-          </div>
-        ` : b.hypotheseConfirmee === false ? `
-          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:16px;">
-            <p style="font-weight:700;margin-bottom:8px;">❌ Hypothèse non confirmée</p>
-            <p style="white-space:pre-wrap;">${esc(b.reorientation) || '—'}</p>
-          </div>
-        ` : '<p style="color:var(--ink3);font-style:italic;">Non statué.</p>'}
+      <!-- SECTION 3 : HYPOTHÈSE -->
+      <section class="no-break" style="margin-bottom:16px;">
+        <h3 style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:4px;">3. Hypothèse diagnostique</h3>
+        <div style="background:#eff6ff;padding:10px 12px;border-radius:6px;border-left:3px solid #1d4ed8;font-size:13px;">${esc(b.hypothesePrincipale) || '<em style="color:#9a9890">Non formulée</em>'}</div>
+        ${b.diagnosticsDifferentiels ? `<p style="margin-top:6px;font-size:12px;color:var(--ink2);"><em>Diagnostics différentiels : ${esc(b.diagnosticsDifferentiels)}</em></p>` : ''}
       </section>
 
+      <!-- SECTION 4 : EXAMEN CLINIQUE -->
+      <section class="no-break" style="margin-bottom:16px;">
+        <h3 style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:4px;">4. Examen clinique</h3>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr style="border-bottom:1px solid #f1f0ec;">
+            <td style="padding:5px 8px;font-weight:600;color:var(--ink2);width:30%;vertical-align:top;">Observation</td>
+            <td style="padding:5px 8px;">${esc(b.observation) || '—'}</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f1f0ec;">
+            <td style="padding:5px 8px;font-weight:600;color:var(--ink2);vertical-align:top;">Articulaire / Musculaire</td>
+            <td style="padding:5px 8px;">${esc(b.bilanArticulaire) || '—'}</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f1f0ec;">
+            <td style="padding:5px 8px;font-weight:600;color:var(--ink2);vertical-align:top;">Neurologique</td>
+            <td style="padding:5px 8px;">${esc(b.bilanNeuro) || '—'}</td>
+          </tr>
+          ${b.testsSpecifiques ? `
+          <tr>
+            <td style="padding:5px 8px;font-weight:600;color:var(--ink2);vertical-align:top;">Tests / Scores</td>
+            <td style="padding:5px 8px;white-space:pre-wrap;">${esc(b.testsSpecifiques)}</td>
+          </tr>` : ''}
+        </table>
+      </section>
+
+      <!-- SECTION 5 : CONCLUSION -->
+      <section class="no-break" style="margin-bottom:${b.visualTests && b.visualTests.length > 0 ? '24px' : '0'};">
+        <h3 style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:4px;">5. Conclusion & Prise en charge</h3>
+        ${b.hypotheseConfirmee === true ? `
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:12px 14px;">
+            <p style="font-weight:700;color:#16a34a;margin-bottom:6px;font-size:13px;">✅ Hypothèse confirmée</p>
+            <p style="white-space:pre-wrap;font-size:13px;">${esc(b.planTraitement) || '—'}</p>
+          </div>
+        ` : b.hypotheseConfirmee === false ? `
+          <div style="background:#f8f7f4;border:1px solid #ccc9c0;border-radius:6px;padding:12px 14px;">
+            <p style="font-weight:700;margin-bottom:6px;font-size:13px;">❌ Hypothèse non confirmée</p>
+            <p style="white-space:pre-wrap;font-size:13px;">${esc(b.reorientation) || '—'}</p>
+          </div>
+        ` : '<p style="color:var(--ink3);font-style:italic;font-size:13px;">Non statué.</p>'}
+      </section>
+
+      <!-- ANNEXES : GRILLES -->
       ${b.visualTests && b.visualTests.length > 0 ? `
-        <div style="margin-top:32px;padding-top:24px;border-top:2px solid var(--ink);">
-          <h2 style="font-family:var(--font-serif);font-size:20px;font-weight:400;margin-bottom:20px;">Annexes — Grilles d'évaluation</h2>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:4px;">
+          <h3 style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:14px;">Annexes — Grilles d'évaluation</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
             ${b.visualTests.map(t => `
-              <div>
-                <p style="font-weight:700;margin-bottom:8px;font-size:14px;">${esc(t.name)}</p>
-                <div style="position:relative;aspect-ratio:3/4;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:#fafaf9;">
-                  ${t.bgImage ? `<img src="${t.bgImage}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:.6;">` : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:12px;">Espace vierge</div>'}
-                  ${t.drawData ? `<img src="${t.drawData}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;">` : ''}
+              <div class="no-break">
+                <p style="font-weight:600;margin-bottom:6px;font-size:12px;color:var(--ink2);">${esc(t.name)}</p>
+                <div style="position:relative;width:100%;aspect-ratio:3/4;border:1px solid #e2e0da;border-radius:6px;overflow:hidden;background:#fafaf9;max-height:220px;">
+                  ${t.bgImage ? `<img src="${t.bgImage}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:.65;">` : ''}
+                  ${t.drawData ? `<img src="${t.drawData}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;">` : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:11px;">Espace vierge</div>'}
                 </div>
               </div>
             `).join('')}
@@ -1939,120 +2003,168 @@ function renderCourrier() {
   const b = currentBilan;
   const today = new Date().toLocaleDateString('fr-FR');
 
+  // Pre-fill from bilan if available
+  const kine = b ? (b.therapistName || '') : '';
+  const dr = b ? (b.doctorName || '') : '';
+  const patient = b ? (b.patientName || '') : '';
+  const motif = b ? (b.motif || '') : '';
+  const phone = b ? (b.therapistPhone || '') : '';
+  const email = b ? (b.therapistEmail || '') : '';
+  const address = b ? (b.therapistAddress || '') : '';
+  const obs = b ? (b.letterObservations || '') : '';
+  const obj = b ? (b.letterObjectifs || '') : '';
+  const synth = b ? (b.letterSynthese || '') : '';
+
   document.getElementById('page-content').innerHTML = `
+    <style>
+      @media print {
+        @page { margin: 15mm 18mm; size: A4; }
+        body * { visibility: hidden; }
+        #courrier-print-area, #courrier-print-area * { visibility: visible; }
+        #courrier-print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0 !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; }
+        .print-hide { display: none !important; }
+        [contenteditable] { border: none !important; outline: none !important; }
+        .editable-hint { display: none !important; }
+      }
+    </style>
+
     <div class="fade-in">
+
+      <!-- BARRE D'ACTIONS -->
       <div class="card print-hide" style="margin-bottom:16px;">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center;">
-          <h3 style="font-size:15px;font-weight:600;">Configuration du courrier</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
+          <div>
+            <p style="font-size:13px;color:var(--ink2);">✏️ <strong>Cliquez sur n'importe quel champ</strong> pour le modifier directement dans la lettre.</p>
+          </div>
           <div style="display:flex;gap:8px;">
-            ${b ? `<button class="btn btn-accent btn-sm" onclick="autoFillLetter()">Remplir depuis bilan en cours</button>` : ''}
-            <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Imprimer</button>
+            ${b ? `<button class="btn btn-accent btn-sm" onclick="autoFillLetter()">Remplir depuis bilan</button>` : ''}
+            <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Imprimer / PDF</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LETTRE -->
+      <div id="courrier-print-area" class="letter-paper">
+
+        <!-- EN-TÊTE -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;">
+          <!-- Bloc kiné (gauche) -->
+          <div>
+            <div contenteditable="true" id="l_kine"
+              style="font-family:var(--font-serif);font-size:18px;color:var(--ink);min-width:160px;outline:none;border-bottom:1px dashed transparent;padding:2px 0;"
+              data-placeholder="Votre nom"
+              onblur="this.style.borderColor='transparent'"
+              onfocus="this.style.borderColor='var(--accent-border)'"
+              >${esc(kine)}</div>
+            <div contenteditable="true" id="l_address"
+              style="font-size:12px;color:var(--ink3);margin-top:3px;outline:none;min-width:200px;border-bottom:1px dashed transparent;padding:2px 0;"
+              data-placeholder="Adresse du cabinet"
+              onblur="this.style.borderColor='transparent'"
+              onfocus="this.style.borderColor='var(--accent-border)'"
+              >${esc(address)}</div>
+            <div contenteditable="true" id="l_contact"
+              style="font-size:12px;color:var(--ink3);margin-top:1px;outline:none;min-width:200px;border-bottom:1px dashed transparent;padding:2px 0;"
+              data-placeholder="Tél · Email"
+              onblur="this.style.borderColor='transparent'"
+              onfocus="this.style.borderColor='var(--accent-border)'"
+              >${[phone, email].filter(Boolean).join(' · ')}</div>
+          </div>
+          <!-- Date + destinataire (droite) -->
+          <div style="text-align:right;">
+            <div style="font-size:13px;color:var(--ink2);margin-bottom:12px;">Le ${today}</div>
+            <div style="font-size:12px;color:var(--ink3);margin-bottom:2px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;">À l'attention de</div>
+            <div contenteditable="true" id="l_doctor"
+              style="font-size:14px;font-weight:600;color:var(--ink);outline:none;min-width:120px;text-align:right;border-bottom:1px dashed transparent;padding:2px 0;"
+              data-placeholder="Dr Nom"
+              onblur="this.style.borderColor='transparent'"
+              onfocus="this.style.borderColor='var(--accent-border)'"
+              >${esc(dr)}</div>
           </div>
         </div>
 
-        <div class="form-row" style="margin-top:16px;">
-          <div class="form-group">
-            <label class="form-label">Dr destinataire</label>
-            <input type="text" id="c_doctorName" value="${b ? esc(b.doctorName || '') : ''}" placeholder="Dr Martin">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Type de bilan</label>
-            <select id="c_reportType">
+        <!-- TITRE -->
+        <div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+          <div style="display:inline-flex;align-items:center;gap:12px;">
+            <h2 style="font-size:14px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;">Rapport Kinésithérapique</h2>
+            <select id="l_type" style="font-size:11px;font-weight:700;padding:3px 8px;border:1px solid var(--ink);border-radius:4px;background:transparent;color:var(--ink);cursor:pointer;text-transform:uppercase;letter-spacing:.5px;">
               <option>INITIAL</option><option>INTERMÉDIAIRE</option><option>FINAL</option>
             </select>
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Votre nom</label>
-            <input type="text" id="c_therapistName" value="${b ? esc(b.therapistName || '') : ''}" placeholder="Sophie Dubois">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Téléphone</label>
-            <input type="text" id="c_therapistPhone" value="${b ? esc(b.therapistPhone || '') : ''}" placeholder="06 xx xx xx xx">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <input type="email" id="c_therapistEmail" value="${b ? esc(b.therapistEmail || '') : ''}" placeholder="kine@cabinet.fr">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Adresse cabinet</label>
-            <input type="text" id="c_therapistAddress" value="${b ? esc(b.therapistAddress || '') : ''}" placeholder="12 rue des Lilas, 75001 Paris">
-          </div>
-        </div>
-      </div>
 
-      <div class="letter-paper" id="courrier-print-area">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:36px;">
+        <!-- INFO PATIENT -->
+        <div style="display:flex;gap:32px;margin-bottom:24px;padding:14px 16px;background:var(--surface2);border-radius:var(--radius-sm);font-size:13px;">
           <div>
-            <div style="font-family:var(--font-serif);font-size:22px;font-weight:400;color:var(--ink);">KinéBilan Pro</div>
-            <div style="font-size:12px;color:var(--ink3);margin-top:2px;" id="l_therapistInfo">
-              <span id="l_therapistName">${b ? esc(b.therapistName || '') : ''}</span>
-            </div>
-            <div style="font-size:12px;color:var(--ink3);" id="l_address">${b ? esc(b.therapistAddress || '') : ''}</div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:3px;">Patient</div>
+            <div contenteditable="true" id="l_patient"
+              style="font-weight:600;outline:none;border-bottom:1px dashed transparent;padding:1px 0;"
+              onblur="this.style.borderColor='transparent'"
+              onfocus="this.style.borderColor='var(--accent-border)'"
+              >${esc(patient)}</div>
           </div>
-          <div style="text-align:right;font-size:13px;color:var(--ink2);">
-            <div>Le ${today}</div>
+          <div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:3px;">Motif</div>
+            <div contenteditable="true" id="l_motif"
+              style="outline:none;border-bottom:1px dashed transparent;padding:1px 0;"
+              onblur="this.style.borderColor='transparent'"
+              onfocus="this.style.borderColor='var(--accent-border)'"
+              >${esc(motif)}</div>
           </div>
         </div>
 
-        <div style="text-align:center;margin-bottom:28px;">
-          <h2 style="font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--ink);padding-bottom:8px;display:inline-block;">Rapport kinésithérapique</h2>
+        <!-- CORPS DE LA LETTRE -->
+        <div style="display:grid;gap:20px;">
+
+          <div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);">Observations & Évaluation</div>
+            <div contenteditable="true" id="l_observations"
+              style="font-size:13px;line-height:1.7;outline:none;min-height:60px;color:var(--ink);white-space:pre-wrap;padding:4px 0;"
+              data-placeholder="Décrivez les résultats de l'examen..."
+              >${esc(obs)}</div>
+          </div>
+
+          <div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);">Objectifs & Prise en charge</div>
+            <div contenteditable="true" id="l_objectifs"
+              style="font-size:13px;line-height:1.7;outline:none;min-height:60px;color:var(--ink);white-space:pre-wrap;padding:4px 0;"
+              data-placeholder="Objectifs thérapeutiques et plan de traitement..."
+              >${esc(obj)}</div>
+          </div>
+
+          <div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);">Évolution & Synthèse</div>
+            <div contenteditable="true" id="l_synthese"
+              style="font-size:13px;line-height:1.7;outline:none;min-height:50px;color:var(--ink);white-space:pre-wrap;padding:4px 0;"
+              data-placeholder="Évolution clinique et conclusion..."
+              >${esc(synth)}</div>
+          </div>
+
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;font-size:14px;">
-          <div>
-            <div style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:4px;">Praticien</div>
-            <div style="font-weight:600;" id="l_kine">${b ? esc(b.therapistName || '...') : '...'}</div>
-          </div>
-          <div>
-            <div style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:4px;">À l'attention du Dr</div>
-            <div style="font-weight:600;" id="l_doctor">${b ? esc(b.doctorName || '...') : '...'}</div>
-          </div>
-          <div>
-            <div style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:4px;">Patient</div>
-            <div style="font-weight:600;">${b ? esc(b.patientName || '...') : '...'}</div>
-          </div>
-          <div>
-            <div style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:4px;">Motif</div>
-            <div>${b ? esc(b.motif || '...') : '...'}</div>
+        <!-- SIGNATURE -->
+        <div style="margin-top:36px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;">
+          <div style="text-align:center;min-width:200px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:24px;">Signature</div>
+            <div style="border-bottom:1px solid var(--ink2);padding-bottom:4px;margin-bottom:6px;min-height:30px;"></div>
+            <div contenteditable="true" id="l_sig_name"
+              style="font-family:var(--font-serif);font-style:italic;font-size:15px;outline:none;color:var(--ink);text-align:center;border-bottom:1px dashed transparent;"
+              onblur="this.style.borderColor='transparent'"
+              onfocus="this.style.borderColor='var(--accent-border)'"
+              >${esc(kine)}</div>
+            <div style="font-size:11px;color:var(--ink3);margin-top:3px;">Masseur-Kinésithérapeute</div>
           </div>
         </div>
 
-        <div style="margin-bottom:12px;display:flex;align-items:center;gap:16px;font-size:13px;">
-          <span style="font-weight:700;">Type :</span>
-          <span style="padding:3px 12px;border:1px solid var(--ink);border-radius:4px;font-weight:600;font-size:12px;" id="l_type">INITIAL</span>
-        </div>
-
-        <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:16px;display:grid;gap:18px;">
-          <div>
-            <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:6px;">Observations & Évaluation</h3>
-            <textarea id="l_observations" rows="4" style="width:100%;border:none;border-bottom:1px solid var(--border);padding:4px 0;font-family:var(--font-sans);font-size:14px;background:transparent;outline:none;resize:vertical;" placeholder="...">${b ? esc(b.letterObservations || '') : ''}</textarea>
-          </div>
-          <div>
-            <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:6px;">Objectifs & Prise en charge</h3>
-            <textarea id="l_objectifs" rows="4" style="width:100%;border:none;border-bottom:1px solid var(--border);padding:4px 0;font-family:var(--font-sans);font-size:14px;background:transparent;outline:none;resize:vertical;" placeholder="...">${b ? esc(b.letterObjectifs || '') : ''}</textarea>
-          </div>
-          <div>
-            <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:6px;">Évolution & Synthèse</h3>
-            <textarea id="l_synthese" rows="3" style="width:100%;border:none;border-bottom:1px solid var(--border);padding:4px 0;font-family:var(--font-sans);font-size:14px;background:transparent;outline:none;resize:vertical;" placeholder="...">${b ? esc(b.letterSynthese || '') : ''}</textarea>
-          </div>
-        </div>
-
-        <div style="margin-top:36px;padding-top:20px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:24px;font-size:13px;">
-          <div style="color:var(--ink2);">
-            <p>${b ? esc(b.therapistPhone || '') : ''}</p>
-            <p>${b ? esc(b.therapistEmail || '') : ''}</p>
-            <p>${b ? esc(b.therapistAddress || '') : ''}</p>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:20px;">Signature</div>
-            <input type="text" id="l_signature" placeholder="Taper pour signer..." style="text-align:right;border:none;border-bottom:1px dashed var(--border2);padding:4px 0;font-family:var(--font-serif);font-style:italic;font-size:18px;width:240px;background:transparent;outline:none;" value="${b ? esc(b.therapistSignature || '') : ''}">
-          </div>
-        </div>
       </div>
     </div>
   `;
+
+  // Add placeholder styling
+  document.querySelectorAll('[contenteditable][data-placeholder]').forEach(el => {
+    if (!el.textContent.trim()) el.classList.add('is-empty');
+    el.addEventListener('focus', () => el.classList.remove('is-empty'));
+    el.addEventListener('blur', () => { if (!el.textContent.trim()) el.classList.add('is-empty'); });
+  });
 }
 
 function autoFillLetter() {
@@ -2079,10 +2191,17 @@ function autoFillLetter() {
   if (b.hypothesePrincipale) synth += `Hypothèse diagnostique : ${b.hypothesePrincipale}\n`;
   if (b.hypotheseConfirmee === false && b.reorientation) synth += `Réorientation : ${b.reorientation}`;
 
-  const el = (id, val) => { const e = document.getElementById(id); if (e) e.value = val; };
-  el('l_observations', obs.trim());
-  el('l_objectifs', obj.trim());
-  el('l_synthese', synth.trim());
+  const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val.trim(); };
+  set('l_observations', obs);
+  set('l_objectifs', obj);
+  set('l_synthese', synth);
+  set('l_kine', b.therapistName || '');
+  set('l_sig_name', b.therapistName || '');
+  set('l_doctor', b.doctorName || '');
+  set('l_patient', b.patientName || '');
+  set('l_motif', b.motif || '');
+  set('l_address', b.therapistAddress || '');
+  set('l_contact', [b.therapistPhone, b.therapistEmail].filter(Boolean).join(' · '));
   toast('✓ Courrier rempli depuis le bilan');
 }
 
