@@ -1,2196 +1,1094 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="KinéBilan Pro">
-<meta name="theme-color" content="#0f172a">
-<title>KinéBilan Pro</title>
-<link rel="manifest" href="manifest.json">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #f8f7f4;
-  --surface: #ffffff;
-  --surface2: #f1f0ec;
-  --border: #e2e0da;
-  --border2: #ccc9c0;
-  --ink: #1a1916;
-  --ink2: #5a5852;
-  --ink3: #9a9890;
-  --accent: #1d4ed8;
-  --accent-light: #eff6ff;
-  --accent-border: #bfdbfe;
-  --green: #16a34a;
-  --green-light: #f0fdf4;
-  --red: #dc2626;
-  --red-light: #fef2f2;
-  --red-border: #fecaca;
-  --yellow-light: #fefce8;
-  --yellow-border: #fde68a;
-  --orange: #ea580c;
-  --orange-light: #fff7ed;
-  --cyan: #0891b2;
-  --sidebar-w: 260px;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.05);
-  --shadow-lg: 0 4px 24px rgba(0,0,0,.10);
-  --font-sans: 'DM Sans', system-ui, sans-serif;
-  --font-serif: 'DM Serif Display', Georgia, serif;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { height: 100%; }
-
-body {
-  font-family: var(--font-sans);
-  background: var(--bg);
-  color: var(--ink);
-  min-height: 100%;
-  display: flex;
-  font-size: 15px;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ===== SIDEBAR ===== */
-#sidebar {
-  width: var(--sidebar-w);
-  background: var(--ink);
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  z-index: 200;
-  transition: transform .3s ease;
-}
-
-.sidebar-logo {
-  padding: 28px 24px 20px;
-  border-bottom: 1px solid rgba(255,255,255,.08);
-}
-
-.sidebar-logo h1 {
-  font-family: var(--font-serif);
-  font-size: 22px;
-  font-weight: 400;
-  line-height: 1.2;
-  letter-spacing: -.3px;
-}
-
-.sidebar-logo span {
-  font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: rgba(255,255,255,.4);
-  display: block;
-  margin-top: 2px;
-}
-
-.sidebar-section {
-  padding: 12px 12px 4px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: rgba(255,255,255,.3);
-}
-
-.sidebar-nav { flex: 1; overflow-y: auto; padding: 8px 0; }
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  margin: 1px 8px;
-  border-radius: var(--radius-sm);
-  color: rgba(255,255,255,.65);
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 450;
-  transition: all .15s;
-  border: none;
-  background: none;
-  width: calc(100% - 16px);
-  text-align: left;
-}
-
-.nav-item:hover { background: rgba(255,255,255,.07); color: #fff; }
-.nav-item.active { background: rgba(255,255,255,.12); color: #fff; font-weight: 500; }
-
-.nav-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: .8; }
-.nav-item.active svg { opacity: 1; }
-
-.nav-badge {
-  margin-left: auto;
-  background: var(--accent);
-  color: white;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 1px 7px;
-  border-radius: 20px;
-  min-width: 20px;
-  text-align: center;
-}
-
-.sidebar-footer {
-  padding: 16px;
-  border-top: 1px solid rgba(255,255,255,.08);
-  font-size: 12px;
-  color: rgba(255,255,255,.3);
-}
-
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.5);
-  z-index: 199;
-}
-
-/* ===== MAIN LAYOUT ===== */
-#main {
-  margin-left: var(--sidebar-w);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-#topbar {
-  height: 60px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  padding: 0 24px;
-  gap: 12px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-#topbar h2 {
-  font-size: 16px;
-  font-weight: 600;
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.menu-toggle {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--ink);
-  padding: 4px;
-}
-
-#page-content {
-  flex: 1;
-  padding: 28px 28px;
-  max-width: 1000px;
-  width: 100%;
-  margin: 0 auto;
-}
-
-/* ===== TYPOGRAPHY ===== */
-h1, h2, h3 { font-weight: 600; line-height: 1.25; }
-.serif { font-family: var(--font-serif); font-weight: 400; }
-
-/* ===== CARDS ===== */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-  box-shadow: var(--shadow);
-}
-
-.card + .card { margin-top: 16px; }
-
-.card-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink2);
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.card-title svg { width: 16px; height: 16px; }
-
-/* ===== BUTTONS ===== */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 9px 18px;
-  border-radius: var(--radius-sm);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: all .15s;
-  white-space: nowrap;
-  text-decoration: none;
-}
-
-.btn svg { width: 15px; height: 15px; flex-shrink: 0; }
-
-.btn-primary { background: var(--ink); color: #fff; }
-.btn-primary:hover { background: #2d2c29; }
-
-.btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
-.btn-accent:hover { background: #1e40af; }
-
-.btn-ghost { background: transparent; color: var(--ink2); border-color: var(--border2); }
-.btn-ghost:hover { background: var(--surface2); color: var(--ink); }
-
-.btn-danger { background: var(--red-light); color: var(--red); border-color: var(--red-border); }
-.btn-danger:hover { background: #fee2e2; }
-
-.btn-success { background: var(--green); color: #fff; }
-.btn-success:hover { background: #15803d; }
-
-.btn-sm { padding: 6px 12px; font-size: 13px; }
-.btn-lg { padding: 12px 24px; font-size: 15px; }
-
-.btn:disabled { opacity: .4; cursor: not-allowed; }
-
-/* ===== FORMS ===== */
-label.form-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ink2);
-  margin-bottom: 6px;
-}
-
-input[type="text"],
-input[type="number"],
-input[type="email"],
-input[type="date"],
-textarea,
-select {
-  width: 100%;
-  padding: 9px 12px;
-  border: 1px solid var(--border2);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  color: var(--ink);
-  background: var(--surface);
-  transition: border-color .15s, box-shadow .15s;
-  outline: none;
-}
-
-input:focus, textarea:focus, select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(29,78,216,.1);
-}
-
-textarea { resize: vertical; min-height: 80px; }
-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a5852' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; }
-
-.form-group { margin-bottom: 18px; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-
-/* ===== RANGE SLIDER ===== */
-input[type="range"] {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 6px;
-  background: var(--border2);
-  border-radius: 3px;
-  padding: 0;
-  border: none;
-  box-shadow: none;
-}
-input[type="range"]:focus { box-shadow: none; }
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--red);
-  cursor: pointer;
-  border: 2px solid white;
-  box-shadow: 0 1px 4px rgba(0,0,0,.2);
-}
-
-/* ===== PROGRESS STEPS ===== */
-.steps-bar {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 4px;
-  margin-bottom: 24px;
-}
-
-.step-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 10px 8px;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-family: var(--font-sans);
-  transition: all .15s;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--ink3);
-}
-
-.step-btn:hover { background: var(--surface); color: var(--ink2); }
-.step-btn.active { background: var(--surface); color: var(--accent); box-shadow: var(--shadow); }
-.step-btn.done { color: var(--green); }
-
-.step-num {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--border);
-  color: var(--ink3);
-  font-size: 11px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.step-btn.active .step-num { background: var(--accent); color: white; }
-.step-btn.done .step-num { background: var(--green); color: white; }
-
-/* ===== ALERT BOXES ===== */
-.alert {
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  border: 1px solid;
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  font-size: 14px;
-}
-.alert svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
-.alert-danger { background: var(--red-light); border-color: var(--red-border); color: #991b1b; }
-.alert-warning { background: var(--yellow-light); border-color: var(--yellow-border); color: #92400e; }
-.alert-info { background: var(--accent-light); border-color: var(--accent-border); color: #1e40af; }
-.alert-success { background: var(--green-light); border-color: #bbf7d0; color: #166534; }
-
-/* ===== PATIENT LIST ===== */
-.patient-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: all .15s;
-  margin-bottom: 8px;
-}
-.patient-card:hover { border-color: var(--accent-border); box-shadow: var(--shadow); transform: translateY(-1px); }
-
-.patient-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: var(--accent-light);
-  color: var(--accent);
-  font-weight: 700;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.patient-info { flex: 1; min-width: 0; }
-.patient-name { font-weight: 600; font-size: 15px; }
-.patient-meta { font-size: 12px; color: var(--ink3); margin-top: 2px; }
-
-.patient-date {
-  font-size: 11px;
-  color: var(--ink3);
-  text-align: right;
-  flex-shrink: 0;
-}
-
-/* ===== BODY CHART CANVAS ===== */
-.canvas-wrapper {
-  position: relative;
-  border: 1px solid var(--border2);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  background: #fafaf9;
-  touch-action: none;
-  aspect-ratio: 4/3;
-  width: 100%;
-  max-width: 560px;
-  margin: 0 auto;
-}
-
-.canvas-wrapper img.canvas-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  opacity: .55;
-  pointer-events: none;
-}
-
-.canvas-wrapper canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  cursor: crosshair;
-  z-index: 2;
-}
-
-/* ===== TEST LIBRARY ===== */
-.test-library-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-}
-
-.test-lib-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  cursor: pointer;
-  transition: all .15s;
-}
-.test-lib-card:hover { border-color: var(--accent-border); box-shadow: var(--shadow); }
-
-.test-lib-tag {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  padding: 2px 8px;
-  border-radius: 20px;
-  margin-bottom: 10px;
-}
-
-.tag-equilibre { background: #e0f2fe; color: #0369a1; }
-.tag-marche { background: #f0fdf4; color: #166534; }
-.tag-force { background: #fef9c3; color: #854d0e; }
-.tag-epaule { background: #fdf4ff; color: #7e22ce; }
-.tag-lombalgie { background: #fff7ed; color: #c2410c; }
-.tag-hanche { background: #fce7f3; color: #be185d; }
-.tag-douleur { background: #fee2e2; color: #991b1b; }
-
-.test-lib-name { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
-.test-lib-desc { font-size: 13px; color: var(--ink2); line-height: 1.5; }
-.test-lib-score { margin-top: 12px; font-size: 12px; color: var(--ink3); border-top: 1px solid var(--border); padding-top: 10px; }
-
-/* ===== MODAL ===== */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.5);
-  z-index: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  backdrop-filter: blur(2px);
-}
-
-.modal {
-  background: var(--surface);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  padding: 28px;
-  max-width: 680px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.modal-title { font-size: 18px; font-weight: 600; }
-.modal-close { background: none; border: none; cursor: pointer; color: var(--ink3); padding: 4px; }
-.modal-close:hover { color: var(--ink); }
-
-/* ===== PRINT ===== */
-.print-area {
-  font-family: var(--font-sans);
-}
-
-/* ===== HOME GRID ===== */
-.home-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
-  margin-top: 24px;
-}
-
-.home-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px 20px;
-  cursor: pointer;
-  transition: all .2s;
-  text-align: left;
-}
-
-.home-card:hover { border-color: var(--border2); box-shadow: var(--shadow-lg); transform: translateY(-2px); }
-.home-card-icon { width: 44px; height: 44px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
-.home-card-icon svg { width: 22px; height: 22px; }
-.home-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-.home-card p { font-size: 13px; color: var(--ink3); line-height: 1.5; }
-
-/* ===== TABS ===== */
-.tabs {
-  display: flex;
-  gap: 2px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 4px;
-  margin-bottom: 20px;
-}
-
-.tab-btn {
-  flex: 1;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: none;
-  background: none;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ink3);
-  cursor: pointer;
-  transition: all .15s;
-  text-align: center;
-}
-
-.tab-btn.active {
-  background: var(--surface);
-  color: var(--ink);
-  box-shadow: var(--shadow);
-}
-
-/* ===== CHECKBOX ===== */
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.checkbox-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--border2);
-  border-radius: 4px;
-  appearance: none;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all .15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.checkbox-label input[type="checkbox"]:checked {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-
-.checkbox-label input[type="checkbox"]:checked::after {
-  content: '';
-  display: block;
-  width: 5px;
-  height: 9px;
-  border: 2px solid white;
-  border-top: none;
-  border-left: none;
-  transform: rotate(45deg) translate(-1px, -1px);
-  margin: auto;
-}
-
-/* ===== TOAST ===== */
-#toast {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: var(--ink);
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 500;
-  box-shadow: var(--shadow-lg);
-  z-index: 999;
-  transform: translateY(100px);
-  opacity: 0;
-  transition: all .25s;
-}
-
-#toast.show { transform: none; opacity: 1; }
-
-/* ===== DIVIDERS ===== */
-.divider { height: 1px; background: var(--border); margin: 24px 0; }
-
-/* ===== STATS ===== */
-.stat-row { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-.stat-box {
-  flex: 1;
-  min-width: 140px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 16px 20px;
-}
-.stat-box .stat-num { font-family: var(--font-serif); font-size: 32px; line-height: 1; color: var(--ink); }
-.stat-box .stat-label { font-size: 12px; color: var(--ink3); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: .6px; }
-
-/* ===== PILL BADGE ===== */
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.pill-blue { background: var(--accent-light); color: var(--accent); }
-.pill-green { background: var(--green-light); color: var(--green); }
-.pill-red { background: var(--red-light); color: var(--red); }
-.pill-orange { background: var(--orange-light); color: var(--orange); }
-
-/* ===== COURRIER ===== */
-.letter-paper {
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 48px 56px;
-  box-shadow: var(--shadow);
-  font-family: 'DM Sans', sans-serif;
-  max-width: 780px;
-}
-
-/* ===== EMPTY STATE ===== */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--ink3);
-}
-.empty-state svg { width: 48px; height: 48px; margin: 0 auto 16px; opacity: .4; display: block; }
-.empty-state h3 { font-size: 16px; font-weight: 600; color: var(--ink2); margin-bottom: 8px; }
-.empty-state p { font-size: 14px; }
-
-/* ===== MOBILE ===== */
-@media (max-width: 768px) {
-  #sidebar { transform: translateX(-100%); }
-  #sidebar.open { transform: none; }
-  .sidebar-overlay.show { display: block; }
-  #main { margin-left: 0; }
-  .menu-toggle { display: flex; }
-  #page-content { padding: 16px; }
-  .form-row, .form-row-3 { grid-template-columns: 1fr; }
-  .home-grid { grid-template-columns: 1fr 1fr; }
-  .letter-paper { padding: 28px 24px; }
-  .stat-row { gap: 10px; }
-  .test-library-grid { grid-template-columns: 1fr; }
-  .steps-bar { gap: 2px; }
-  .step-btn { font-size: 10px; padding: 8px 4px; }
-  .step-btn span.step-label { display: none; }
-}
-
-@media print {
-  #sidebar, #topbar, .print-hide { display: none !important; }
-  #main { margin-left: 0; }
-  #page-content { padding: 0; max-width: 100%; }
-  body { background: white; }
-  .card { box-shadow: none; border: 1px solid #ccc; }
-}
-
-/* ===== ANIMATIONS ===== */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
-}
-
-.fade-in { animation: fadeIn .25s ease forwards; }
-</style>
-</head>
-<body>
-
-<!-- SIDEBAR -->
-<nav id="sidebar">
-  <div class="sidebar-logo">
-    <h1>KinéBilan<br>Pro</h1>
-    <span>Outil clinique</span>
-  </div>
-  <div class="sidebar-nav">
-    <div class="sidebar-section">Principal</div>
-    <button class="nav-item active" onclick="showPage('home')" id="nav-home">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-      Accueil
-    </button>
-    <button class="nav-item" onclick="showPage('patients')" id="nav-patients">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-      Mes patients
-      <span class="nav-badge" id="patient-count">0</span>
-    </button>
-    <button class="nav-item" onclick="startNewBilan()" id="nav-bilan">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-      Nouveau bilan
-    </button>
-
-    <div class="sidebar-section" style="margin-top:8px;">Outils</div>
-    <button class="nav-item" onclick="showPage('courrier')" id="nav-courrier">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-      Courrier médecin
-    </button>
-    <button class="nav-item" onclick="showPage('tests')" id="nav-tests">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-      Bibliothèque tests
-    </button>
-  </div>
-  <div class="sidebar-footer">
-    v2.0 · Données locales uniquement
-  </div>
-</nav>
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
-
-<!-- MAIN -->
-<div id="main">
-  <header id="topbar">
-    <button class="menu-toggle" onclick="toggleSidebar()">
-      <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-    </button>
-    <h2 id="page-title">Accueil</h2>
-    <div id="topbar-actions"></div>
-  </header>
-
-  <div id="page-content" class="fade-in"></div>
-</div>
-
-<div id="toast"></div>
-
-<input type="file" id="import-file" accept=".json" style="display:none" onchange="importBilan(event)">
-
-<script>
-// ===== DATABASE (IndexedDB) =====
-const DB_NAME = 'KineBilanDB';
-const DB_VER = 1;
-let db;
-
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VER);
-    req.onupgradeneeded = e => {
-      const d = e.target.result;
-      if (!d.objectStoreNames.contains('patients')) {
-        const store = d.createObjectStore('patients', { keyPath: 'id' });
-        store.createIndex('nom', 'nom', { unique: false });
-      }
-      if (!d.objectStoreNames.contains('bilans')) {
-        const bs = d.createObjectStore('bilans', { keyPath: 'id' });
-        bs.createIndex('patientId', 'patientId', { unique: false });
-        bs.createIndex('date', 'date', { unique: false });
-      }
-    };
-    req.onsuccess = e => { db = e.target.result; resolve(db); };
-    req.onerror = e => reject(e);
-  });
-}
-
-async function dbGet(store, id) {
-  return new Promise((res, rej) => {
-    const tx = db.transaction(store, 'readonly');
-    tx.objectStore(store).get(id).onsuccess = e => res(e.target.result);
-  });
-}
-
-async function dbGetAll(store) {
-  return new Promise((res, rej) => {
-    const tx = db.transaction(store, 'readonly');
-    const req = tx.objectStore(store).getAll();
-    req.onsuccess = e => res(e.target.result);
-    req.onerror = e => res([]);
-  });
-}
-
-async function dbPut(store, data) {
-  return new Promise((res, rej) => {
-    const tx = db.transaction(store, 'readwrite');
-    tx.objectStore(store).put(data).onsuccess = e => res(e.target.result);
-  });
-}
-
-async function dbDelete(store, id) {
-  return new Promise((res, rej) => {
-    const tx = db.transaction(store, 'readwrite');
-    tx.objectStore(store).delete(id).onsuccess = () => res();
-  });
-}
-
-async function getPatientBilans(patientId) {
-  return new Promise((res) => {
-    const tx = db.transaction('bilans', 'readonly');
-    const idx = tx.objectStore('bilans').index('patientId');
-    idx.getAll(patientId).onsuccess = e => res(e.target.result || []);
-  });
-}
-
-// ===== STATE =====
-let currentPage = 'home';
-let currentBilan = null;
-let currentStep = 1;
-let canvasDrawing = false;
-let activeTestModal = null;
-
-// ===== SIDEBAR / NAV =====
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sidebar-overlay').classList.toggle('show');
-}
-
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebar-overlay').classList.remove('show');
-}
-
-function setActiveNav(page) {
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  const el = document.getElementById('nav-' + page);
-  if (el) el.classList.add('active');
-}
-
-function showPage(page) {
-  closeSidebar();
-  currentPage = page;
-  setActiveNav(page);
-  const titles = {
-    home: 'Accueil',
-    patients: 'Mes patients',
-    bilan: 'Nouveau bilan',
-    courrier: 'Courrier médecin',
-    tests: 'Bibliothèque de tests'
-  };
-  document.getElementById('page-title').textContent = titles[page] || '';
-  document.getElementById('topbar-actions').innerHTML = '';
-  const content = document.getElementById('page-content');
-  content.className = 'fade-in';
-  void content.offsetWidth;
-
-  switch (page) {
-    case 'home': renderHome(); break;
-    case 'patients': renderPatients(); break;
-    case 'bilan': renderBilan(); break;
-    case 'courrier': renderCourrier(); break;
-    case 'tests': renderTests(); break;
-  }
-}
-
-// ===== TOAST =====
-function toast(msg, duration = 2500) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), duration);
-}
-
-// ===== HOME =====
-async function renderHome() {
-  const patients = await dbGetAll('patients');
-  const bilans = await dbGetAll('bilans');
-  const todayStr = new Date().toLocaleDateString('fr-FR');
-
-  document.getElementById('page-content').innerHTML = `
-    <div class="fade-in">
-      <div style="margin-bottom:28px;">
-        <h2 class="serif" style="font-size:28px; margin-bottom:4px;">Bonjour 👋</h2>
-        <p style="color:var(--ink3); font-size:14px;">${todayStr}</p>
-      </div>
-
-      <div class="stat-row">
-        <div class="stat-box">
-          <div class="stat-num">${patients.length}</div>
-          <div class="stat-label">Patients</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num">${bilans.length}</div>
-          <div class="stat-label">Bilans réalisés</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num">${bilans.filter(b => b.date && b.date.startsWith(new Date().toISOString().slice(0,7))).length}</div>
-          <div class="stat-label">Ce mois-ci</div>
-        </div>
-      </div>
-
-      <div class="home-grid">
-        <button class="home-card" onclick="startNewBilan()" style="border-color:var(--accent-border);">
-          <div class="home-card-icon" style="background:var(--accent-light); color:var(--accent);">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          </div>
-          <h3>Nouveau bilan</h3>
-          <p>Créer un BDK structuré en 5 étapes</p>
-        </button>
-
-        <button class="home-card" onclick="showPage('patients')">
-          <div class="home-card-icon" style="background:#f0fdf4; color:var(--green);">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          </div>
-          <h3>Mes patients</h3>
-          <p>Consulter et gérer les dossiers</p>
-        </button>
-
-        <button class="home-card" onclick="showPage('courrier')">
-          <div class="home-card-icon" style="background:var(--orange-light); color:var(--orange);">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-          </div>
-          <h3>Courrier médecin</h3>
-          <p>Générer un rapport formel</p>
-        </button>
-
-        <button class="home-card" onclick="showPage('tests')">
-          <div class="home-card-icon" style="background:#e0f2fe; color:var(--cyan);">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-          </div>
-          <h3>Tests validés</h3>
-          <p>Berg, TUG, Tinetti, Constant...</p>
-        </button>
-      </div>
-
-      ${patients.length > 0 ? `
-      <div style="margin-top:32px;">
-        <h3 style="font-size:14px; font-weight:600; color:var(--ink2); text-transform:uppercase; letter-spacing:.8px; margin-bottom:14px;">Derniers patients</h3>
-        ${patients.slice(-3).reverse().map(p => patientCardHTML(p)).join('')}
-      </div>` : ''}
-    </div>
-  `;
-  updatePatientCount();
-}
-
-// ===== PATIENTS =====
-function patientCardHTML(p) {
-  const initials = (p.nom || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-  const date = p.lastBilan ? new Date(p.lastBilan).toLocaleDateString('fr-FR') : 'Aucun bilan';
-  return `
-    <div class="patient-card" onclick="openPatient('${p.id}')">
-      <div class="patient-avatar">${initials}</div>
-      <div class="patient-info">
-        <div class="patient-name">${p.nom || 'Patient sans nom'}</div>
-        <div class="patient-meta">${p.age ? p.age + ' ans · ' : ''}${p.motif || 'Motif non renseigné'}</div>
-      </div>
-      <div class="patient-date">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px;">Dernier bilan</div>
-        ${date}
-      </div>
-    </div>
-  `;
-}
-
-async function renderPatients() {
-  const patients = await dbGetAll('patients');
-  const content = document.getElementById('page-content');
-
-  document.getElementById('topbar-actions').innerHTML = `
-    <button class="btn btn-primary btn-sm" onclick="startNewBilan()">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:14px;height:14px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-      Nouveau
-    </button>
-  `;
-
-  if (patients.length === 0) {
-    content.innerHTML = `
-      <div class="empty-state fade-in">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        <h3>Aucun patient enregistré</h3>
-        <p>Créez votre premier bilan pour commencer</p>
-        <button class="btn btn-accent" style="margin-top:20px;" onclick="startNewBilan()">Créer un bilan</button>
-      </div>
-    `;
-    return;
-  }
-
-  const sorted = [...patients].sort((a, b) => (b.lastBilan || '').localeCompare(a.lastBilan || ''));
-  content.innerHTML = `
-    <div class="fade-in">
-      <div style="margin-bottom:16px; color:var(--ink3); font-size:14px;">${patients.length} patient${patients.length > 1 ? 's' : ''} enregistré${patients.length > 1 ? 's' : ''}</div>
-      ${sorted.map(p => patientCardHTML(p)).join('')}
-    </div>
-  `;
-}
-
-async function openPatient(id) {
-  const patient = await dbGet('patients', id);
-  const bilans = await getPatientBilans(id);
-
-  const initials = (patient.nom || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal" style="max-width:720px;">
-      <div class="modal-header">
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div class="patient-avatar" style="width:52px;height:52px;font-size:20px;">${initials}</div>
-          <div>
-            <div class="modal-title">${patient.nom}</div>
-            <div style="font-size:13px;color:var(--ink3);">${patient.age ? patient.age + ' ans' : ''} ${patient.motif ? '· ' + patient.motif : ''}</div>
-          </div>
-        </div>
-        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-      </div>
-
-      <div class="divider" style="margin:16px 0;"></div>
-
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <h3 style="font-size:14px;font-weight:600;color:var(--ink2);">BILANS (${bilans.length})</h3>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn-accent btn-sm" onclick="this.closest('.modal-overlay').remove(); loadAndEditBilan('${id}')">Nouveau bilan</button>
-          <button class="btn btn-danger btn-sm" onclick="deletePatient('${id}')">Supprimer</button>
-        </div>
-      </div>
-
-      ${bilans.length === 0 ? `<p style="color:var(--ink3);font-size:14px;padding:20px 0;">Aucun bilan pour ce patient.</p>` :
-        bilans.sort((a,b) => b.date.localeCompare(a.date)).map(b => `
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;">
-            <div>
-              <div style="font-weight:600;font-size:14px;">BDK du ${new Date(b.date).toLocaleDateString('fr-FR')}</div>
-              <div style="font-size:12px;color:var(--ink3);">${b.step === 5 || b.complete ? 'Complet' : 'Étape ' + b.step + '/5'}</div>
-            </div>
-            <div style="display:flex;gap:8px;">
-              <button class="btn btn-ghost btn-sm" onclick="openBilanFromDB('${b.id}'); this.closest('.modal-overlay').remove();">Ouvrir</button>
-              <button class="btn btn-danger btn-sm" onclick="deleteBilan('${b.id}', '${id}')">✕</button>
-            </div>
-          </div>
-        `).join('')
-      }
-    </div>
-  `;
-  document.body.appendChild(modal);
-}
-
-async function deletePatient(id) {
-  if (!confirm('Supprimer ce patient et tous ses bilans ?')) return;
-  const bilans = await getPatientBilans(id);
-  for (const b of bilans) await dbDelete('bilans', b.id);
-  await dbDelete('patients', id);
-  document.querySelector('.modal-overlay')?.remove();
-  toast('Patient supprimé');
-  renderPatients();
-  updatePatientCount();
-}
-
-async function deleteBilan(bilanId, patientId) {
-  if (!confirm('Supprimer ce bilan ?')) return;
-  await dbDelete('bilans', bilanId);
-  document.querySelector('.modal-overlay')?.remove();
-  toast('Bilan supprimé');
-  openPatient(patientId);
-}
-
-async function updatePatientCount() {
-  const patients = await dbGetAll('patients');
-  document.getElementById('patient-count').textContent = patients.length;
-}
-
-function loadAndEditBilan(patientId) {
-  startNewBilan(patientId);
-}
-
-// ===== BILAN =====
-const EMPTY_BILAN = () => ({
-  id: Date.now().toString(),
-  patientId: null,
-  date: new Date().toISOString(),
-  step: 1,
-  complete: false,
-  patientName: '', age: '', motif: '',
-  objectifsCT: '', objectifsMT: '', objectifsLT: '', dureeReeval: '',
-  douleurType: '', eva: 0,
-  bodyChartData: null,
-  redFlag1: false, redFlag1Details: '', yellowFlags: '',
-  hypothesePrincipale: '', diagnosticsDifferentiels: '',
-  observation: '', bilanArticulaire: '', bilanNeuro: '', testsSpecifiques: '',
-  redFlag2: false, redFlag2Details: '',
-  visualTests: [],
-  hypotheseConfirmee: null, planTraitement: '', reorientation: '',
-  doctorName: '', reportType: 'INITIAL',
-  therapistName: '', therapistEmail: '', therapistPhone: '', therapistAddress: '', therapistSignature: '',
-  letterObservations: '', letterObjectifs: '', letterSynthese: ''
-});
-
-function startNewBilan(patientId = null) {
-  closeSidebar();
-  currentBilan = EMPTY_BILAN();
-  if (patientId) currentBilan.patientId = patientId;
-  currentStep = 1;
-  showPage('bilan');
-}
-
-async function openBilanFromDB(id) {
-  const b = await dbGet('bilans', id);
-  if (!b) return;
-  currentBilan = b;
-  currentStep = b.step || 1;
-  showPage('bilan');
-}
-
-function getField(name) {
-  return currentBilan[name] ?? '';
-}
-
-function setField(name, value) {
-  currentBilan[name] = value;
-}
-
-async function saveBilan() {
-  if (!currentBilan) return;
-  currentBilan.step = currentStep;
-
-  // Create or update patient
-  if (currentBilan.patientName) {
-    if (!currentBilan.patientId) {
-      currentBilan.patientId = 'p_' + Date.now();
+import React, { useState, useRef, useEffect } from 'react';
+
+// --- COMPOSANT : TOILE DE DESSIN INTERACTIVE (CANVAS) ---
+const DrawableCanvas = ({ onChange, initialData, bgImage, aspectRatioClass = "aspect-[4/3]", canvasWidth = 800, canvasHeight = 600 }) => {
+  const canvasRef = useRef(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+
+  useEffect(() => {
+    if (initialData && canvasRef.current) {
+      const ctx = canvasRef.current.getContext('2d');
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0);
+      img.src = initialData;
     }
-    const existingPatient = await dbGet('patients', currentBilan.patientId);
-    await dbPut('patients', {
-      id: currentBilan.patientId,
-      nom: currentBilan.patientName,
-      age: currentBilan.age,
-      motif: currentBilan.motif,
-      lastBilan: currentBilan.date
-    });
-  }
+  }, [initialData]);
 
-  await dbPut('bilans', currentBilan);
-  updatePatientCount();
-  toast('✓ Sauvegardé');
-}
-
-function renderBilan() {
-  setActiveNav('bilan');
-  document.getElementById('page-title').textContent = currentBilan?.patientName ? `Bilan — ${currentBilan.patientName}` : 'Nouveau bilan';
-
-  document.getElementById('topbar-actions').innerHTML = `
-    <button class="btn btn-ghost btn-sm print-hide" onclick="saveBilan()">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:14px;height:14px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-      Sauvegarder
-    </button>
-  `;
-
-  const steps = ['Anamnèse', 'Hypothèses', 'Examen', 'Conclusion', 'Résumé'];
-
-  const redFlagAlert = (currentBilan.redFlag1 || currentBilan.redFlag2) && currentStep < 5 ? `
-    <div class="alert alert-danger" style="margin-bottom:20px;">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-      <div><strong>Drapeau rouge détecté</strong> — Réorientation médicale conseillée.</div>
-    </div>` : '';
-
-  document.getElementById('page-content').innerHTML = `
-    <div class="fade-in">
-      <div class="steps-bar">
-        ${steps.map((s, i) => `
-          <button class="step-btn ${currentStep === i+1 ? 'active' : currentStep > i+1 ? 'done' : ''}" onclick="goToStep(${i+1})">
-            <div class="step-num">${currentStep > i+1 ? '✓' : i+1}</div>
-            <span class="step-label">${s}</span>
-          </button>
-        `).join('')}
-      </div>
-
-      ${redFlagAlert}
-
-      <div id="step-content"></div>
-
-      <div class="print-hide" style="display:flex;justify-content:space-between;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
-        <button class="btn btn-ghost" onclick="prevStep()" ${currentStep===1?'disabled':''}>← Retour</button>
-        ${currentStep < 5
-          ? `<button class="btn btn-accent" onclick="nextStep()">Suivant →</button>`
-          : `<button class="btn btn-success" onclick="finishBilan()">Terminer ✓</button>`
-        }
-      </div>
-    </div>
-  `;
-
-  renderStep();
-}
-
-function goToStep(n) {
-  collectFormData();
-  currentStep = n;
-  renderBilan();
-}
-
-function prevStep() {
-  collectFormData();
-  if (currentStep > 1) { currentStep--; renderBilan(); }
-}
-
-function nextStep() {
-  collectFormData();
-  if (currentStep < 5) { currentStep++; renderBilan(); }
-  saveBilan();
-}
-
-async function finishBilan() {
-  collectFormData();
-  currentBilan.complete = true;
-  await saveBilan();
-  toast('✓ Bilan finalisé et sauvegardé !', 3000);
-  showPage('patients');
-}
-
-function collectFormData() {
-  const fields = ['patientName','age','motif','objectifsCT','objectifsMT','objectifsLT','dureeReeval',
-    'douleurType','redFlag1Details','yellowFlags','hypothesePrincipale','diagnosticsDifferentiels',
-    'observation','bilanArticulaire','bilanNeuro','testsSpecifiques','redFlag2Details',
-    'planTraitement','reorientation'];
-  fields.forEach(f => {
-    const el = document.getElementById('f_' + f);
-    if (el) currentBilan[f] = el.value;
-  });
-  const eva = document.getElementById('f_eva');
-  if (eva) currentBilan.eva = parseInt(eva.value);
-  const rf1 = document.getElementById('f_redFlag1');
-  if (rf1) currentBilan.redFlag1 = rf1.checked;
-  const rf2 = document.getElementById('f_redFlag2');
-  if (rf2) currentBilan.redFlag2 = rf2.checked;
-}
-
-function renderStep() {
-  const c = document.getElementById('step-content');
-  switch (currentStep) {
-    case 1: c.innerHTML = renderStep1(); initCanvas(); break;
-    case 2: c.innerHTML = renderStep2(); break;
-    case 3: c.innerHTML = renderStep3(); initVisualTests(); break;
-    case 4: c.innerHTML = renderStep4(); break;
-    case 5: c.innerHTML = renderStep5(); break;
-  }
-}
-
-function renderStep1() {
-  return `
-    <div class="card">
-      <div class="card-title">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-        Patient
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Nom du patient</label>
-          <input type="text" id="f_patientName" value="${esc(getField('patientName'))}" placeholder="Nom Prénom">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Âge</label>
-          <input type="number" id="f_age" value="${esc(getField('age'))}" placeholder="42">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Motif de consultation</label>
-        <textarea id="f_motif" rows="2" placeholder="Ex: Lombalgie chronique suite à hernie L4-L5...">${esc(getField('motif'))}</textarea>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:16px;">
-      <div class="card-title">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-        Objectifs
-      </div>
-      <div class="form-row-3">
-        <div class="form-group">
-          <label class="form-label">Court terme</label>
-          <textarea id="f_objectifsCT" rows="2" placeholder="J-15...">${esc(getField('objectifsCT'))}</textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Moyen terme</label>
-          <textarea id="f_objectifsMT" rows="2" placeholder="2-3 mois...">${esc(getField('objectifsMT'))}</textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Long terme</label>
-          <textarea id="f_objectifsLT" rows="2" placeholder="6 mois+...">${esc(getField('objectifsLT'))}</textarea>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Date de réévaluation cible</label>
-        <input type="text" id="f_dureeReeval" value="${esc(getField('dureeReeval'))}" placeholder="Ex: Dans 6 semaines — J+45">
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:16px;">
-      <div class="card-title">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-        Sémiologie de la douleur
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Type et rythme</label>
-          <input type="text" id="f_douleurType" value="${esc(getField('douleurType'))}" placeholder="Mécanique / Inflammatoire...">
-        </div>
-        <div class="form-group">
-          <label class="form-label">EVA : <strong style="color:var(--red);">${getField('eva')}/10</strong></label>
-          <input type="range" id="f_eva" min="0" max="10" value="${getField('eva')}" oninput="document.querySelector('#f_eva').previousElementSibling.querySelector('strong').textContent = this.value + '/10'">
-        </div>
-      </div>
-
-      <div style="margin-top:8px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <label class="form-label" style="margin:0;">Body Chart</label>
-          <label class="btn btn-ghost btn-sm" style="cursor:pointer;">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-            Changer fond
-            <input type="file" accept="image/*" style="display:none" onchange="uploadBodyChartBg(event)">
-          </label>
-        </div>
-        <div class="canvas-wrapper" id="body-canvas-wrapper">
-          ${currentBilan.bodyChartBg ? `<img class="canvas-bg" src="${currentBilan.bodyChartBg}" alt="fond">` : ''}
-          <canvas id="body-canvas"></canvas>
-        </div>
-        <div style="text-align:center;margin-top:8px;">
-          <button class="btn btn-danger btn-sm" onclick="clearCanvas()">Effacer tracés</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:16px;">
-      <div class="card-title">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-        Drapeaux
-      </div>
-      <div class="form-row">
-        <div style="background:var(--red-light);border:1px solid var(--red-border);border-radius:var(--radius-sm);padding:16px;">
-          <label class="checkbox-label" style="color:#991b1b;margin-bottom:${currentBilan.redFlag1?'10px':'0'};">
-            <input type="checkbox" id="f_redFlag1" ${currentBilan.redFlag1?'checked':''} onchange="toggleRedFlag1(this.checked)">
-            🚩 Drapeaux rouges (anamnèse)
-          </label>
-          <div id="rf1-detail" style="${currentBilan.redFlag1?'':'display:none'};">
-            <input type="text" id="f_redFlag1Details" value="${esc(getField('redFlag1Details'))}" placeholder="Précisez (perte de poids, fièvre...)" style="margin-top:10px;">
-          </div>
-        </div>
-        <div style="background:var(--yellow-light);border:1px solid var(--yellow-border);border-radius:var(--radius-sm);padding:16px;">
-          <label class="form-label">🔸 Drapeaux jaunes (BPS)</label>
-          <input type="text" id="f_yellowFlags" value="${esc(getField('yellowFlags'))}" placeholder="Peurs, croyances, stress, contexte...">
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function toggleRedFlag1(checked) {
-  document.getElementById('rf1-detail').style.display = checked ? '' : 'none';
-  currentBilan.redFlag1 = checked;
-}
-
-function renderStep2() {
-  return `
-    <div class="card">
-      <div class="card-title">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-        Raisonnement clinique
-      </div>
-      <div class="alert alert-info" style="margin-bottom:20px;">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <div>Formez vos hypothèses <strong>avant</strong> l'examen clinique. C'est la base du raisonnement diagnostique.</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Hypothèse principale (H1)</label>
-        <textarea id="f_hypothesePrincipale" rows="3" placeholder="Ex: Lombosciatique L5 droite sur conflit disco-radiculaire...">${esc(getField('hypothesePrincipale'))}</textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Diagnostics différentiels (H2, H3...)</label>
-        <textarea id="f_diagnosticsDifferentiels" rows="2" placeholder="Ex: Syndrome facettaire, Claudication neurogène...">${esc(getField('diagnosticsDifferentiels'))}</textarea>
-      </div>
-    </div>
-  `;
-}
-
-const STANDARD_TESTS = [
-  "Test de Berg (Équilibre)","Time Up and Go (TUG)","Test de Tinetti",
-  "Dynamométrie (Force)","Test de Marche de 6 Minutes (TM6)","Score de Constant (Épaule)",
-  "Index d'Oswestry (Lombalgie)","Score de Lequesne (Hanche/Genou)","Autre..."
-];
-
-function renderStep3() {
-  return `
-    <div class="card">
-      <div class="card-title">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-        Examen clinique
-      </div>
-      <div class="form-group">
-        <label class="form-label">Observation & Palpation</label>
-        <textarea id="f_observation" rows="2" placeholder="Posture, déformation, cicatrice, points douloureux...">${esc(getField('observation'))}</textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Bilan articulaire & musculaire</label>
-        <textarea id="f_bilanArticulaire" rows="2" placeholder="Amplitudes, force, contractures...">${esc(getField('bilanArticulaire'))}</textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Bilan neurologique</label>
-        <textarea id="f_bilanNeuro" rows="2" placeholder="Sensibilité, réflexes, déficit moteur...">${esc(getField('bilanNeuro'))}</textarea>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:16px;">
-      <div class="card-title">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-        Tests fonctionnels (espaces annotables)
-      </div>
-      <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px;">
-        <div style="flex:1;min-width:200px;">
-          <label class="form-label">Ajouter un test</label>
-          <select id="test-select">
-            ${STANDARD_TESTS.map(t => `<option value="${t}">${t}</option>`).join('')}
-          </select>
-        </div>
-        <div id="custom-test-wrapper" style="display:none;flex:1;min-width:200px;">
-          <label class="form-label">Nom du test</label>
-          <input type="text" id="custom-test-name" placeholder="Nom personnalisé...">
-        </div>
-        <button class="btn btn-accent" onclick="addVisualTest()">+ Ajouter</button>
-      </div>
-
-      <div id="visual-tests-container"></div>
-
-      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
-        <label class="form-label">Notes textuelles (résultats chiffrés)</label>
-        <textarea id="f_testsSpecifiques" rows="2" placeholder="Ex: TUG = 12s, Berg = 42/56, TM6 = 380m...">${esc(getField('testsSpecifiques'))}</textarea>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:16px;border-color:var(--red-border);background:var(--red-light);">
-      <label class="checkbox-label" style="color:#991b1b;margin-bottom:${currentBilan.redFlag2?'12px':'0'};">
-        <input type="checkbox" id="f_redFlag2" ${currentBilan.redFlag2?'checked':''} onchange="toggleRedFlag2(this.checked)">
-        🚩 Drapeaux rouges à l'examen clinique
-      </label>
-      <div id="rf2-detail" style="${currentBilan.redFlag2?'':'display:none'};">
-        <input type="text" id="f_redFlag2Details" value="${esc(getField('redFlag2Details'))}" placeholder="Précisez la découverte...">
-      </div>
-    </div>
-  `;
-}
-
-function toggleRedFlag2(checked) {
-  document.getElementById('rf2-detail').style.display = checked ? '' : 'none';
-  currentBilan.redFlag2 = checked;
-}
-
-function initVisualTests() {
-  const select = document.getElementById('test-select');
-  if (select) {
-    select.addEventListener('change', () => {
-      document.getElementById('custom-test-wrapper').style.display = select.value === 'Autre...' ? '' : 'none';
-    });
-  }
-  renderVisualTests();
-}
-
-function addVisualTest() {
-  const select = document.getElementById('test-select');
-  let name = select.value === 'Autre...' ? (document.getElementById('custom-test-name')?.value || '') : select.value;
-  if (!name.trim()) { toast('Entrez un nom de test'); return; }
-  if (!currentBilan.visualTests) currentBilan.visualTests = [];
-  currentBilan.visualTests.push({ id: Date.now().toString(), name, bgImage: null, drawData: null });
-  renderVisualTests();
-}
-
-function removeVisualTest(id) {
-  currentBilan.visualTests = currentBilan.visualTests.filter(t => t.id !== id);
-  renderVisualTests();
-}
-
-function renderVisualTests() {
-  const c = document.getElementById('visual-tests-container');
-  if (!c) return;
-  if (!currentBilan.visualTests || currentBilan.visualTests.length === 0) {
-    c.innerHTML = '<p style="font-size:13px;color:var(--ink3);padding:12px 0;">Aucun test ajouté. Utilisez le menu ci-dessus.</p>';
-    return;
-  }
-  c.innerHTML = currentBilan.visualTests.map((t, idx) => `
-    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <strong style="font-size:15px;">${esc(t.name)}</strong>
-        <div style="display:flex;gap:8px;">
-          <label class="btn btn-ghost btn-sm" style="cursor:pointer;">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:13px;height:13px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-            Fond
-            <input type="file" accept="image/*" style="display:none" onchange="uploadTestBg(event, '${t.id}')">
-          </label>
-          <button class="btn btn-danger btn-sm" onclick="removeVisualTest('${t.id}')">✕</button>
-        </div>
-      </div>
-      <div class="canvas-wrapper" id="vt-canvas-${t.id}" style="aspect-ratio:3/4;max-width:400px;">
-        ${t.bgImage ? `<img class="canvas-bg" src="${t.bgImage}" alt="fond">` : ''}
-        <canvas id="vc-${t.id}"></canvas>
-      </div>
-      <div style="text-align:center;margin-top:8px;">
-        <button class="btn btn-danger btn-sm" onclick="clearTestCanvas('${t.id}')">Effacer</button>
-      </div>
-    </div>
-  `).join('');
-
-  // init canvases
-  currentBilan.visualTests.forEach(t => {
-    const canvas = document.getElementById('vc-' + t.id);
-    if (!canvas) return;
-    initCanvasEl(canvas, t.bgImage, t.drawData, (data) => {
-      t.drawData = data;
-    });
-  });
-}
-
-function clearTestCanvas(id) {
-  const t = currentBilan.visualTests.find(t => t.id === id);
-  if (t) t.drawData = null;
-  const canvas = document.getElementById('vc-' + id);
-  if (canvas) {
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-}
-
-function uploadTestBg(e, id) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const t = currentBilan.visualTests.find(t => t.id === id);
-    if (t) t.bgImage = ev.target.result;
-    renderVisualTests();
-  };
-  reader.readAsDataURL(file);
-}
-
-function renderStep4() {
-  const confirmed = currentBilan.hypotheseConfirmee;
-  return `
-    <div class="card">
-      <div class="card-title">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Décision clinique
-      </div>
-      <p style="margin-bottom:20px;color:var(--ink2);font-size:14px;">L'hypothèse principale <strong>${esc(currentBilan.hypothesePrincipale) || 'non formulée'}</strong> est-elle confirmée ?</p>
-      <div style="display:flex;gap:12px;margin-bottom:24px;">
-        <button onclick="setHypotheseConfirmee(true)" class="btn btn-lg ${confirmed === true ? 'btn-success' : 'btn-ghost'}" style="flex:1;">✓ Oui, confirmée</button>
-        <button onclick="setHypotheseConfirmee(false)" class="btn btn-lg ${confirmed === false ? 'btn-primary' : 'btn-ghost'}" style="flex:1;">✗ Non confirmée</button>
-      </div>
-      ${confirmed === true ? `
-        <div class="alert alert-success" style="margin-bottom:16px;">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <div>Hypothèse confirmée — Définissez le projet thérapeutique</div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Plan de traitement & PEC</label>
-          <textarea id="f_planTraitement" rows="4" placeholder="Techniques employées, fréquence, progression...">${esc(getField('planTraitement'))}</textarea>
-        </div>
-      ` : confirmed === false ? `
-        <div class="alert alert-info" style="margin-bottom:16px;">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <div>Hypothèse non confirmée — Que faites-vous ?</div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Réorientation / Nouvelle hypothèse</label>
-          <textarea id="f_reorientation" rows="4" placeholder="Retour au médecin, nouvelle hypothèse, examens complémentaires...">${esc(getField('reorientation'))}</textarea>
-        </div>
-      ` : '<p style="color:var(--ink3);font-size:14px;font-style:italic;">Choisissez une option ci-dessus.</p>'}
-    </div>
-  `;
-}
-
-function setHypotheseConfirmee(val) {
-  collectFormData();
-  currentBilan.hypotheseConfirmee = val;
-  renderBilan();
-}
-
-function renderStep5() {
-  const b = currentBilan;
-  const dateStr = new Date(b.date).toLocaleDateString('fr-FR');
-  return `
-    <div class="card print-hide" style="margin-bottom:16px;">
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button class="btn btn-ghost" onclick="window.print()">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-          Imprimer
-        </button>
-        <button class="btn btn-ghost" onclick="exportBilan()">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-          Export JSON
-        </button>
-        <button class="btn btn-accent" onclick="showPage('courrier')">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-          Générer courrier
-        </button>
-      </div>
-    </div>
-
-    <div id="bilan-print-area" style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:40px;font-family:var(--font-sans);">
-      <div style="border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom:24px;">
-        <h1 style="font-family:var(--font-serif);font-size:26px;font-weight:400;margin-bottom:6px;">Bilan Diagnostic Kinésithérapique</h1>
-        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--ink2);">
-          <span>Patient : <strong>${esc(b.patientName) || 'Non renseigné'}</strong>${b.age ? ` (${b.age} ans)` : ''}</span>
-          <span>${dateStr}</span>
-        </div>
-      </div>
-
-      <section style="margin-bottom:20px;">
-        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:10px;">1. Motif & Objectifs</h3>
-        <p style="margin-bottom:10px;"><strong>Motif :</strong> ${esc(b.motif) || '—'}</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;background:var(--surface2);padding:14px;border-radius:var(--radius-sm);">
-          <div><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px;">COURT TERME</div>${esc(b.objectifsCT) || '—'}</div>
-          <div><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px;">MOYEN TERME</div>${esc(b.objectifsMT) || '—'}</div>
-          <div><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px;">LONG TERME</div>${esc(b.objectifsLT) || '—'}</div>
-        </div>
-        ${b.dureeReeval ? `<p style="margin-top:10px;font-size:13px;"><em>Réévaluation : ${esc(b.dureeReeval)}</em></p>` : ''}
-      </section>
-
-      <section style="margin-bottom:20px;">
-        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:10px;">2. Sémiologie</h3>
-        <p><strong>Type :</strong> ${esc(b.douleurType) || '—'} &nbsp;·&nbsp; <strong>EVA :</strong> <span style="color:var(--red);font-weight:700;">${b.eva}/10</span></p>
-        ${b.bodyChartData ? `
-          <div style="margin-top:12px;">
-            <div style="position:relative;width:220px;aspect-ratio:4/3;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:#fafaf9;">
-              ${b.bodyChartBg ? `<img src="${b.bodyChartBg}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:.45;">` : ''}
-              <img src="${b.bodyChartData}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;">
-            </div>
-          </div>` : ''}
-      </section>
-
-      ${(b.redFlag1 || b.redFlag2 || b.yellowFlags) ? `
-      <section style="margin-bottom:20px;padding:14px;background:var(--red-light);border:1px solid var(--red-border);border-radius:var(--radius-sm);">
-        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#991b1b;margin-bottom:8px;">Drapeaux</h3>
-        ${b.redFlag1 ? `<p style="color:#991b1b;">🚩 Anamnèse : ${esc(b.redFlag1Details) || 'oui'}</p>` : ''}
-        ${b.redFlag2 ? `<p style="color:#991b1b;">🚩 Clinique : ${esc(b.redFlag2Details) || 'oui'}</p>` : ''}
-        ${b.yellowFlags ? `<p style="color:#92400e;">🔸 BPS : ${esc(b.yellowFlags)}</p>` : ''}
-      </section>` : ''}
-
-      <section style="margin-bottom:20px;">
-        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:10px;">3. Hypothèse diagnostique</h3>
-        <p style="background:var(--accent-light);padding:12px;border-radius:var(--radius-sm);border-left:3px solid var(--accent);">${esc(b.hypothesePrincipale) || 'Non formulée'}</p>
-        ${b.diagnosticsDifferentiels ? `<p style="margin-top:8px;font-size:13px;color:var(--ink2);"><em>DD : ${esc(b.diagnosticsDifferentiels)}</em></p>` : ''}
-      </section>
-
-      <section style="margin-bottom:20px;">
-        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:10px;">4. Examen clinique</h3>
-        <div style="background:var(--surface2);padding:14px;border-radius:var(--radius-sm);display:grid;gap:8px;font-size:14px;">
-          <p><strong>Observation :</strong> ${esc(b.observation) || '—'}</p>
-          <p><strong>Articulaire/Musculaire :</strong> ${esc(b.bilanArticulaire) || '—'}</p>
-          <p><strong>Neurologique :</strong> ${esc(b.bilanNeuro) || '—'}</p>
-          ${b.testsSpecifiques ? `<p><strong>Tests :</strong> ${esc(b.testsSpecifiques)}</p>` : ''}
-        </div>
-      </section>
-
-      <section>
-        <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:10px;">5. Conclusion</h3>
-        ${b.hypotheseConfirmee === true ? `
-          <div style="background:var(--green-light);border:1px solid #bbf7d0;border-radius:var(--radius-sm);padding:16px;">
-            <p style="font-weight:700;color:var(--green);margin-bottom:8px;">✅ Hypothèse confirmée</p>
-            <p style="white-space:pre-wrap;">${esc(b.planTraitement) || '—'}</p>
-          </div>
-        ` : b.hypotheseConfirmee === false ? `
-          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:16px;">
-            <p style="font-weight:700;margin-bottom:8px;">❌ Hypothèse non confirmée</p>
-            <p style="white-space:pre-wrap;">${esc(b.reorientation) || '—'}</p>
-          </div>
-        ` : '<p style="color:var(--ink3);font-style:italic;">Non statué.</p>'}
-      </section>
-
-      ${b.visualTests && b.visualTests.length > 0 ? `
-        <div style="margin-top:32px;padding-top:24px;border-top:2px solid var(--ink);">
-          <h2 style="font-family:var(--font-serif);font-size:20px;font-weight:400;margin-bottom:20px;">Annexes — Grilles d'évaluation</h2>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-            ${b.visualTests.map(t => `
-              <div>
-                <p style="font-weight:700;margin-bottom:8px;font-size:14px;">${esc(t.name)}</p>
-                <div style="position:relative;aspect-ratio:3/4;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:#fafaf9;">
-                  ${t.bgImage ? `<img src="${t.bgImage}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:.6;">` : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:12px;">Espace vierge</div>'}
-                  ${t.drawData ? `<img src="${t.drawData}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;">` : ''}
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      ` : ''}
-    </div>
-  `;
-}
-
-// ===== CANVAS =====
-function initCanvas() {
-  const canvas = document.getElementById('body-canvas');
-  if (!canvas) return;
-  initCanvasEl(canvas, currentBilan.bodyChartBg, currentBilan.bodyChartData, (data) => {
-    currentBilan.bodyChartData = data;
-  });
-}
-
-function initCanvasEl(canvas, bgImage, drawData, onSave) {
-  const wrapper = canvas.parentElement;
-  canvas.width = 800;
-  canvas.height = 600;
-  if (canvas.dataset.initialized) return;
-  canvas.dataset.initialized = '1';
-
-  const ctx = canvas.getContext('2d');
-  if (drawData) {
-    const img = new Image();
-    img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    img.src = drawData;
-  }
-
-  let drawing = false;
-  let lastX = 0, lastY = 0;
-
-  function getPos(e) {
+  const getCoordinates = (e) => {
+    const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    return [(clientX - rect.left) * scaleX, (clientY - rect.top) * scaleY];
-  }
+    
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
 
-  function start(e) {
-    if (e.cancelable) e.preventDefault();
-    drawing = true;
-    const [x, y] = getPos(e);
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  };
+
+  const startDrawing = (e) => {
+    if (e.cancelable) e.preventDefault(); 
+    setIsDrawing(true);
+    const { x, y } = getCoordinates(e);
+    const ctx = canvasRef.current.getContext('2d');
     ctx.beginPath();
     ctx.moveTo(x, y);
-    lastX = x; lastY = y;
-  }
+  };
 
-  function move(e) {
-    if (!drawing) return;
+  const draw = (e) => {
+    if (!isDrawing) return;
     if (e.cancelable) e.preventDefault();
-    const [x, y] = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
+    const { x, y } = getCoordinates(e);
+    const ctx = canvasRef.current.getContext('2d');
     ctx.lineTo(x, y);
-    ctx.strokeStyle = '#ef4444';
-    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#ef4444'; // Trait Rouge
+    ctx.lineWidth = 3;
     ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
     ctx.stroke();
-    lastX = x; lastY = y;
-  }
+  };
 
-  function stop() {
-    if (drawing) {
-      drawing = false;
-      onSave(canvas.toDataURL());
+  const stopDrawing = () => {
+    if (isDrawing) {
+      setIsDrawing(false);
+      const canvas = canvasRef.current;
+      onChange(canvas.toDataURL()); 
     }
-  }
-
-  canvas.addEventListener('mousedown', start);
-  canvas.addEventListener('mousemove', move);
-  canvas.addEventListener('mouseup', stop);
-  canvas.addEventListener('mouseleave', stop);
-  canvas.addEventListener('touchstart', start, { passive: false });
-  canvas.addEventListener('touchmove', move, { passive: false });
-  canvas.addEventListener('touchend', stop);
-}
-
-function clearCanvas() {
-  const canvas = document.getElementById('body-canvas');
-  if (!canvas) return;
-  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-  currentBilan.bodyChartData = null;
-}
-
-function uploadBodyChartBg(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    currentBilan.bodyChartBg = ev.target.result;
-    renderBilan();
   };
-  reader.readAsDataURL(file);
-}
 
-// ===== EXPORT / IMPORT =====
-function exportBilan() {
-  if (!currentBilan) return;
-  const json = JSON.stringify(currentBilan);
-  const a = document.createElement('a');
-  a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(json);
-  a.download = `BDK_${currentBilan.patientName || 'Patient'}_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.json`;
-  a.click();
-}
-
-function importBilan(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const data = JSON.parse(ev.target.result);
-      if (!data.visualTests) data.visualTests = [];
-      currentBilan = data;
-      currentStep = data.step || 5;
-      showPage('bilan');
-      toast('Bilan importé avec succès');
-    } catch { toast('Erreur : fichier invalide'); }
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    onChange(null);
   };
-  reader.readAsText(file);
-}
 
-// ===== COURRIER =====
-function renderCourrier() {
-  const b = currentBilan;
-  const today = new Date().toLocaleDateString('fr-FR');
-
-  document.getElementById('page-content').innerHTML = `
-    <div class="fade-in">
-      <div class="card print-hide" style="margin-bottom:16px;">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center;">
-          <h3 style="font-size:15px;font-weight:600;">Configuration du courrier</h3>
-          <div style="display:flex;gap:8px;">
-            ${b ? `<button class="btn btn-accent btn-sm" onclick="autoFillLetter()">Remplir depuis bilan en cours</button>` : ''}
-            <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Imprimer</button>
-          </div>
-        </div>
-
-        <div class="form-row" style="margin-top:16px;">
-          <div class="form-group">
-            <label class="form-label">Dr destinataire</label>
-            <input type="text" id="c_doctorName" value="${b ? esc(b.doctorName || '') : ''}" placeholder="Dr Martin">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Type de bilan</label>
-            <select id="c_reportType">
-              <option>INITIAL</option><option>INTERMÉDIAIRE</option><option>FINAL</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Votre nom</label>
-            <input type="text" id="c_therapistName" value="${b ? esc(b.therapistName || '') : ''}" placeholder="Sophie Dubois">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Téléphone</label>
-            <input type="text" id="c_therapistPhone" value="${b ? esc(b.therapistPhone || '') : ''}" placeholder="06 xx xx xx xx">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <input type="email" id="c_therapistEmail" value="${b ? esc(b.therapistEmail || '') : ''}" placeholder="kine@cabinet.fr">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Adresse cabinet</label>
-            <input type="text" id="c_therapistAddress" value="${b ? esc(b.therapistAddress || '') : ''}" placeholder="12 rue des Lilas, 75001 Paris">
-          </div>
-        </div>
+  return (
+    <div className="flex flex-col items-center w-full max-w-2xl mx-auto">
+      <div className={`relative border border-slate-300 rounded-lg shadow-inner overflow-hidden touch-none w-full bg-slate-50 ${aspectRatioClass}`}>
+        {/* L'image de fond (Body Chart ou Grille de test) */}
+        {bgImage && (
+          <img 
+            src={bgImage} 
+            alt="Fond annotable" 
+            className="absolute inset-0 w-full h-full object-contain opacity-60 pointer-events-none"
+          />
+        )}
+        {/* Calque de dessin transparent par-dessus */}
+        <canvas
+          ref={canvasRef}
+          width={canvasWidth}
+          height={canvasHeight}
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseLeave={stopDrawing}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
+          className="absolute inset-0 w-full h-full cursor-crosshair z-10"
+        />
       </div>
+      <button type="button" onClick={clearCanvas} className="mt-3 px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-red-50 text-red-600 border border-red-200 rounded-md hover:bg-red-100 transition-colors">
+        Effacer les tracés
+      </button>
+    </div>
+  );
+};
 
-      <div class="letter-paper" id="courrier-print-area">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:36px;">
-          <div>
-            <div style="font-family:var(--font-serif);font-size:22px;font-weight:400;color:var(--ink);">KinéBilan Pro</div>
-            <div style="font-size:12px;color:var(--ink3);margin-top:2px;" id="l_therapistInfo">
-              <span id="l_therapistName">${b ? esc(b.therapistName || '') : ''}</span>
+// --- COMPOSANT PRINCIPAL ---
+export default function App() {
+  const [currentView, setCurrentView] = useState('home');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [step, setStep] = useState(1);
+  const fileInputRef = useRef(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyEmail = (e) => {
+    if (e) e.preventDefault();
+    const textArea = document.createElement("textarea");
+    textArea.value = "support@kinebilanpro.fr";
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // --- INJECTION DU MODULE PDF ---
+  useEffect(() => {
+    if (!document.getElementById('html2pdf-script')) {
+      const script = document.createElement("script");
+      script.id = 'html2pdf-script';
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+
+  const generatePDF = (elementId, defaultFilename) => {
+    if (typeof window.html2pdf === 'undefined') {
+      alert("Le module de génération PDF est en cours de chargement. Veuillez patienter quelques secondes.");
+      return;
+    }
+    const element = document.getElementById(elementId);
+    const filename = `${defaultFilename}_${formData.patientName ? formData.patientName.replace(/\s+/g, '_') : 'Patient'}.pdf`;
+    const opt = {
+      margin:       [10, 10, 10, 10],
+      filename:     filename,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    window.html2pdf().set(opt).from(element).save();
+  };
+
+  // Liste des tests standards disponibles
+  const standardTests = [
+    "Test de Berg (Équilibre)",
+    "Time Up and Go (TUG)",
+    "Test de Tinetti",
+    "Dynamométrie (Force)",
+    "Test de Marche de 6 Minutes (TM6)",
+    "Score de Constant (Épaule)",
+    "Index d'Oswestry (Lombalgie)",
+    "Score de Lequesne (Hanche/Genou)",
+    "Autre..."
+  ];
+  const [selectedTestToAdd, setSelectedTestToAdd] = useState(standardTests[0]);
+  const [customTestName, setCustomTestName] = useState('');
+
+  const emptyForm = {
+    // Phase 1
+    patientName: '', age: '', motif: '',
+    objectifsCT: '', objectifsMT: '', objectifsLT: '', dureeReeval: '',
+    contexteBPS: '', histoire: '', douleurType: '', eva: 0,
+    bodyChartData: null, bodyChartBg: 'image_89f020.jpg',
+    redFlag1: false, redFlag1Details: '', yellowFlags: '',
+    // Phase 2
+    hypothesePrincipale: '', diagnosticsDifferentiels: '',
+    // Phase 3
+    observation: '', bilanArticulaire: '', bilanNeuro: '', testsSpecifiques: '',
+    redFlag2: false, redFlag2Details: '',
+    visualTests: [], // TABLEAU DES TESTS VISUELS
+    // Phase 4
+    hypotheseConfirmee: null, planTraitement: '', reorientation: '',
+    // Courrier
+    doctorName: '', reportType: 'INITIAL',
+    therapistName: '', therapistEmail: '', therapistPhone: '', therapistAddress: '',
+    therapistSignature: '', 
+    letterObservations: '', letterObjectifs: '', letterSynthese: ''
+  };
+
+  const [formData, setFormData] = useState(emptyForm);
+
+  // États pour les modules annexes
+  const [importedSuivi, setImportedSuivi] = useState([]);
+  const [importedTestsLib, setImportedTestsLib] = useState([]);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const nextStep = () => setStep(prev => Math.min(prev + 1, 5));
+  const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
+
+  // --- GESTION DU BODY CHART (Phase 1) ---
+  const handleBgUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => setFormData(prev => ({ ...prev, bodyChartBg: event.target.result }));
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // --- GESTION DES TESTS VISUELS (Phase 3) ---
+  const handleAddVisualTest = () => {
+    const testName = selectedTestToAdd === "Autre..." ? customTestName : selectedTestToAdd;
+    if (!testName || !testName.trim()) {
+      alert("Veuillez saisir un nom pour votre test personnalisé.");
+      return;
+    }
+    
+    const newTest = {
+      id: Date.now(),
+      name: testName,
+      bgImage: null, // Pas de fond par défaut = espace vierge blanc cassé
+      drawData: null
+    };
+
+    setFormData(prev => ({
+      ...prev,
+      visualTests: [...(prev.visualTests || []), newTest]
+    }));
+
+    if (selectedTestToAdd === "Autre...") setCustomTestName('');
+  };
+
+  const removeVisualTest = (id) => {
+    if(window.confirm("Êtes-vous sûr de vouloir supprimer cet espace de test ?")) {
+      setFormData(prev => ({
+        ...prev,
+        visualTests: prev.visualTests.filter(t => t.id !== id)
+      }));
+    }
+  };
+
+  const updateVisualTestDraw = (id, data) => {
+    setFormData(prev => ({
+      ...prev,
+      visualTests: prev.visualTests.map(t => t.id === id ? { ...t, drawData: data } : t)
+    }));
+  };
+
+  const updateVisualTestBg = (e, id) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFormData(prev => ({
+          ...prev,
+          visualTests: prev.visualTests.map(t => t.id === id ? { ...t, bgImage: event.target.result } : t)
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // --- LOGIQUE SAUVEGARDE / IMPORT (.JSON) ---
+  const handleExportData = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(formData));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", `Bilan_${formData.patientName ? formData.patientName.replace(/\s+/g, '_') : 'Patient'}.json`);
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  };
+
+  const handleImportData = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const importedData = JSON.parse(event.target.result);
+          if (!importedData.visualTests) importedData.visualTests = [];
+          setFormData(importedData);
+          setCurrentView('new_bilan');
+          setStep(5);
+          setIsMenuOpen(false);
+        } catch (err) {
+          alert("Erreur lors de l'import. Le fichier n'est pas un bilan valide.");
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const triggerImport = () => {
+    if(fileInputRef.current) fileInputRef.current.click();
+  };
+
+  const startNewBilan = () => {
+    if(window.confirm("Commencer un nouveau bilan effacera les données non sauvegardées. Continuer ?")) {
+      setFormData(emptyForm);
+      setStep(1);
+      setCurrentView('new_bilan');
+      setIsMenuOpen(false);
+    }
+  };
+
+  const navigateTo = (view) => {
+    setCurrentView(view);
+    setIsMenuOpen(false);
+    window.scrollTo(0, 0);
+  };
+
+  // --- GÉNÉRATION AUTOMATIQUE DU COURRIER ---
+  const autoFillLetter = () => {
+    let obsText = "";
+    if (formData.douleurType || formData.eva) obsText += `Sémiologie : ${formData.douleurType || 'Non spécifié'} (EVA ${formData.eva}/10)\n`;
+    if (formData.observation) obsText += `Observation : ${formData.observation}\n`;
+    if (formData.bilanArticulaire) obsText += `Bilan articulaire/musculaire : ${formData.bilanArticulaire}\n`;
+    if (formData.bilanNeuro) obsText += `Bilan neuro : ${formData.bilanNeuro}\n`;
+    
+    // Inclure le nom des tests visuels réalisés
+    if (formData.visualTests && formData.visualTests.length > 0) {
+      obsText += `Tests réalisés : ${formData.visualTests.map(t => t.name).join(', ')}\n`;
+    }
+    if (formData.testsSpecifiques) obsText += `Autres notes cliniques : ${formData.testsSpecifiques}\n`;
+
+    let objText = "";
+    if (formData.objectifsCT || formData.objectifsMT || formData.objectifsLT) {
+      objText += "Objectifs du patient :\n";
+      if (formData.objectifsCT) objText += `- CT : ${formData.objectifsCT}\n`;
+      if (formData.objectifsMT) objText += `- MT : ${formData.objectifsMT}\n`;
+      if (formData.objectifsLT) objText += `- LT : ${formData.objectifsLT}\n`;
+      objText += "\n";
+    }
+    if (formData.planTraitement) objText += `Axe de traitement prévu :\n${formData.planTraitement}`;
+
+    let synthText = "";
+    if (formData.hypothesePrincipale) synthText += `Hypothèse diagnostique : ${formData.hypothesePrincipale}\n`;
+    if (formData.hypotheseConfirmee === false && formData.reorientation) {
+      synthText += `\nPoints d'attention / Réorientation :\n${formData.reorientation}`;
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      letterObservations: obsText.trim(),
+      letterObjectifs: objText.trim(),
+      letterSynthese: synthText.trim()
+    }));
+  };
+
+  const renderProgressBar = () => {
+    const steps = ['Anamnèse', 'Hypothèses', 'Examen', 'Conclusion', 'Résumé'];
+    return (
+      <div className="w-full bg-slate-100 p-2 sm:p-4 rounded-xl mb-6 print:hidden flex items-center">
+        <button 
+          onClick={prevStep} 
+          disabled={step === 1}
+          className={`p-2 rounded-full flex-shrink-0 transition-colors ${step === 1 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'}`}
+          title="Étape précédente"
+        >
+          <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+        <div className="flex-1 flex justify-between items-center px-1 sm:px-4">
+          {steps.map((s, i) => (
+            <div key={i} className={`flex flex-col items-center ${step === i + 1 ? 'text-blue-600 font-bold' : 'text-slate-400'}`}>
+              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center mb-1 text-sm sm:text-base ${step === i + 1 ? 'bg-blue-600 text-white shadow-md' : step > i + 1 ? 'bg-green-500 text-white' : 'bg-slate-200'}`}>
+                {step > i + 1 ? '✓' : i + 1}
+              </div>
+              <span className="hidden md:block text-xs">{s}</span>
             </div>
-            <div style="font-size:12px;color:var(--ink3);" id="l_address">${b ? esc(b.therapistAddress || '') : ''}</div>
-          </div>
-          <div style="text-align:right;font-size:13px;color:var(--ink2);">
-            <div>Le ${today}</div>
-          </div>
+          ))}
         </div>
-
-        <div style="text-align:center;margin-bottom:28px;">
-          <h2 style="font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--ink);padding-bottom:8px;display:inline-block;">Rapport kinésithérapique</h2>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;font-size:14px;">
-          <div>
-            <div style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:4px;">Praticien</div>
-            <div style="font-weight:600;" id="l_kine">${b ? esc(b.therapistName || '...') : '...'}</div>
-          </div>
-          <div>
-            <div style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:4px;">À l'attention du Dr</div>
-            <div style="font-weight:600;" id="l_doctor">${b ? esc(b.doctorName || '...') : '...'}</div>
-          </div>
-          <div>
-            <div style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:4px;">Patient</div>
-            <div style="font-weight:600;">${b ? esc(b.patientName || '...') : '...'}</div>
-          </div>
-          <div>
-            <div style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:4px;">Motif</div>
-            <div>${b ? esc(b.motif || '...') : '...'}</div>
-          </div>
-        </div>
-
-        <div style="margin-bottom:12px;display:flex;align-items:center;gap:16px;font-size:13px;">
-          <span style="font-weight:700;">Type :</span>
-          <span style="padding:3px 12px;border:1px solid var(--ink);border-radius:4px;font-weight:600;font-size:12px;" id="l_type">INITIAL</span>
-        </div>
-
-        <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:16px;display:grid;gap:18px;">
-          <div>
-            <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:6px;">Observations & Évaluation</h3>
-            <textarea id="l_observations" rows="4" style="width:100%;border:none;border-bottom:1px solid var(--border);padding:4px 0;font-family:var(--font-sans);font-size:14px;background:transparent;outline:none;resize:vertical;" placeholder="...">${b ? esc(b.letterObservations || '') : ''}</textarea>
-          </div>
-          <div>
-            <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:6px;">Objectifs & Prise en charge</h3>
-            <textarea id="l_objectifs" rows="4" style="width:100%;border:none;border-bottom:1px solid var(--border);padding:4px 0;font-family:var(--font-sans);font-size:14px;background:transparent;outline:none;resize:vertical;" placeholder="...">${b ? esc(b.letterObjectifs || '') : ''}</textarea>
-          </div>
-          <div>
-            <h3 style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:6px;">Évolution & Synthèse</h3>
-            <textarea id="l_synthese" rows="3" style="width:100%;border:none;border-bottom:1px solid var(--border);padding:4px 0;font-family:var(--font-sans);font-size:14px;background:transparent;outline:none;resize:vertical;" placeholder="...">${b ? esc(b.letterSynthese || '') : ''}</textarea>
-          </div>
-        </div>
-
-        <div style="margin-top:36px;padding-top:20px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:24px;font-size:13px;">
-          <div style="color:var(--ink2);">
-            <p>${b ? esc(b.therapistPhone || '') : ''}</p>
-            <p>${b ? esc(b.therapistEmail || '') : ''}</p>
-            <p>${b ? esc(b.therapistAddress || '') : ''}</p>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:20px;">Signature</div>
-            <input type="text" id="l_signature" placeholder="Taper pour signer..." style="text-align:right;border:none;border-bottom:1px dashed var(--border2);padding:4px 0;font-family:var(--font-serif);font-style:italic;font-size:18px;width:240px;background:transparent;outline:none;" value="${b ? esc(b.therapistSignature || '') : ''}">
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function autoFillLetter() {
-  const b = currentBilan;
-  if (!b) return;
-  let obs = '';
-  if (b.douleurType || b.eva) obs += `Sémiologie : ${b.douleurType || 'non précisé'} (EVA ${b.eva}/10)\n`;
-  if (b.observation) obs += `Observation : ${b.observation}\n`;
-  if (b.bilanArticulaire) obs += `Bilan articulaire/musculaire : ${b.bilanArticulaire}\n`;
-  if (b.bilanNeuro) obs += `Bilan neurologique : ${b.bilanNeuro}\n`;
-  if (b.visualTests?.length) obs += `Tests réalisés : ${b.visualTests.map(t => t.name).join(', ')}\n`;
-  if (b.testsSpecifiques) obs += b.testsSpecifiques;
-
-  let obj = '';
-  if (b.objectifsCT || b.objectifsMT || b.objectifsLT) {
-    obj += 'Objectifs :\n';
-    if (b.objectifsCT) obj += `- Court terme : ${b.objectifsCT}\n`;
-    if (b.objectifsMT) obj += `- Moyen terme : ${b.objectifsMT}\n`;
-    if (b.objectifsLT) obj += `- Long terme : ${b.objectifsLT}\n`;
-  }
-  if (b.planTraitement) obj += `\nAxe de traitement : ${b.planTraitement}`;
-
-  let synth = '';
-  if (b.hypothesePrincipale) synth += `Hypothèse diagnostique : ${b.hypothesePrincipale}\n`;
-  if (b.hypotheseConfirmee === false && b.reorientation) synth += `Réorientation : ${b.reorientation}`;
-
-  const el = (id, val) => { const e = document.getElementById(id); if (e) e.value = val; };
-  el('l_observations', obs.trim());
-  el('l_objectifs', obj.trim());
-  el('l_synthese', synth.trim());
-  toast('✓ Courrier rempli depuis le bilan');
-}
-
-// ===== TESTS LIBRARY =====
-const TESTS_DATA = [
-  {
-    name: 'Test de Berg', tag: 'equilibre', tagLabel: 'Équilibre',
-    desc: 'Évalue l\'équilibre statique et dynamique en 14 items. Utilisé pour le risque de chute.',
-    score: 'Score total : 0–56 pts\n≥ 45 : faible risque chute\n36–44 : risque modéré\n< 36 : risque élevé',
-    items: ['Se tenir debout sans aide (60s)', 'Se lever d\'une chaise', 'S\'asseoir', 'Transferts', 'Debout les yeux fermés (10s)', 'Debout pieds joints (60s)', 'Atteindre un objet en avant', 'Ramasser un objet au sol', 'Se retourner (regard derrière)', 'Rotation 360°', 'Poser pied sur marche (x4)', 'Debout pieds joints, en tandem', 'Debout sur une jambe', 'Assis sans dossier (2 min)']
-  },
-  {
-    name: 'Time Up and Go (TUG)', tag: 'marche', tagLabel: 'Marche',
-    desc: 'Mesure le temps nécessaire pour se lever d\'une chaise, marcher 3m, faire demi-tour, revenir et se rasseoir.',
-    score: '< 10s : mobilité normale\n10–20s : mobilité limitée\n> 20s : risque chute élevé\n> 30s : dépendance probable',
-    items: ['Patient assis sur chaise avec dossier et accoudoirs', 'Signal de départ', 'Se lever', 'Marcher 3 mètres', 'Faire demi-tour', 'Revenir', 'S\'asseoir', 'Chronomètre arrêté']
-  },
-  {
-    name: 'Test de Tinetti', tag: 'equilibre', tagLabel: 'Équilibre',
-    desc: 'Évalue la marche et l\'équilibre. Deux sous-scores : équilibre (16 pts) et marche (12 pts).',
-    score: 'Total max : 28 pts\n< 19 : risque élevé de chute\n19–24 : risque modéré\n≥ 25 : bon équilibre',
-    items: ['Équilibre assis', 'Lever de chaise', 'Équilibre debout immédiat', 'Équilibre debout 5s', 'Équilibre yeux fermés', 'Équilibre en rotation', 'Équilibre après poussée sternale', 'Tandem', 'Appui unipodal', 'Demi-tour', 'Initiation de la marche', 'Longueur et hauteur du pas', 'Symétrie', 'Régularité', 'Dérivation', 'Stabilité du tronc', 'Polygone de sustentation']
-  },
-  {
-    name: 'Score de Constant', tag: 'epaule', tagLabel: 'Épaule',
-    desc: 'Évalue la fonction de l\'épaule : douleur (15), AVQ (20), mobilité (40), force (25).',
-    score: 'Total : 100 pts\nNormes selon âge et sexe\n< 75% : atteinte significative',
-    items: ['Douleur (EVA /15)', 'AVQ – position du bras', 'AVQ – bras dominant', 'Sommeil (douleur nocturne)', 'Élévation antérieure active', 'Élévation latérale active', 'Rotation externe', 'Rotation interne', 'Force abduction (dynamomètre 0–25pts)']
-  },
-  {
-    name: 'Index d\'Oswestry', tag: 'lombalgie', tagLabel: 'Lombalgie',
-    desc: 'Évalue le handicap fonctionnel lié à la lombalgie. 10 sections, score en pourcentage.',
-    score: '0–20% : handicap minimal\n21–40% : modéré\n41–60% : sévère\n61–80% : très sévère\n> 80% : grabataire',
-    items: ['Intensité de la douleur (6 niveaux)', 'Hygiène personnelle', 'Soulever des charges', 'Marche', 'Position assise', 'Position debout', 'Sommeil', 'Vie sexuelle', 'Vie sociale', 'Voyages/Transports']
-  },
-  {
-    name: 'Score de Lequesne', tag: 'hanche', tagLabel: 'Hanche / Genou',
-    desc: 'Index algono-fonctionnel pour la gonarthrose et la coxarthrose. Douleur + périmètre de marche + AVQ.',
-    score: 'Hanche ou Genou\n0–4 : handicap faible\n5–7 : modéré\n8–10 : important\n11–13 : très important\n> 14 : extrêmement important',
-    items: ['Douleur nocturne', 'Douleur au lever', 'Douleur debout > 30min', 'Douleur marche', 'Douleur assis/lever', 'Périmètre de marche', 'Monter les escaliers', 'Se baisser', 'Marche sur sol irrégulier', 'Distance des deux talons']
-  },
-  {
-    name: 'Dynamométrie (Force)', tag: 'force', tagLabel: 'Force',
-    desc: 'Mesure de la force musculaire avec dynamomètre manuel ou isocinétique. En Newtons ou kg.',
-    score: 'Comparer bilatéralement\nDéficit > 10-15% : significatif\nNormes selon âge, sexe, groupe musculaire',
-    items: ['Force de préhension (dynamomètre)', 'Pinch grip', 'Flexion genou', 'Extension genou', 'Abduction épaule', 'Flexion hanche', 'Dorsiflexion cheville', 'Plantiflexion']
-  },
-  {
-    name: 'Test de Marche 6 minutes (TM6)', tag: 'marche', tagLabel: 'Marche',
-    desc: 'Mesure la distance parcourue en 6 minutes. Évalue la capacité fonctionnelle aérobie.',
-    score: 'Homme adulte : 400–700m\nFemme adulte : 350–650m\nVarie selon âge, taille, poids\nFc, SpO2, dyspnée à surveiller',
-    items: ['Périmètre normalisé 30m', 'Repos 10min avant', 'FC et SpO2 avant', 'Chronométrage exact 6min', 'Arrêts autorisés (comptés)', 'Distance totale en mètres', 'FC et SpO2 après', 'Borg dyspnée (0–10)', 'Borg fatigue membres inf (0–10)']
-  },
-  {
-    name: 'EVA / NRS', tag: 'douleur', tagLabel: 'Douleur',
-    desc: 'Échelle visuelle analogique ou numérique. Simple, rapide, reproductible.',
-    score: '0 : pas de douleur\n1–3 : légère\n4–6 : modérée\n7–10 : sévère\nVariation ≥ 2 points = significative',
-    items: ['Douleur au repos', 'Douleur à la mobilisation', 'Douleur au mouvement résisté', 'Pire douleur des 24h', 'Meilleure douleur des 24h', 'Douleur nocturne']
-  }
-];
-
-function renderTests() {
-  document.getElementById('page-content').innerHTML = `
-    <div class="fade-in">
-      <div class="tabs">
-        <button class="tab-btn active" onclick="filterTests('all', this)">Tous</button>
-        <button class="tab-btn" onclick="filterTests('equilibre', this)">Équilibre</button>
-        <button class="tab-btn" onclick="filterTests('marche', this)">Marche</button>
-        <button class="tab-btn" onclick="filterTests('force', this)">Force</button>
-        <button class="tab-btn" onclick="filterTests('epaule', this)">Épaule</button>
-        <button class="tab-btn" onclick="filterTests('lombalgie', this)">Lombalgie</button>
-        <button class="tab-btn" onclick="filterTests('hanche', this)">Hanche</button>
-        <button class="tab-btn" onclick="filterTests('douleur', this)">Douleur</button>
-      </div>
-      <div class="test-library-grid" id="tests-grid">
-        ${TESTS_DATA.map(t => renderTestCard(t)).join('')}
-      </div>
-    </div>
-  `;
-}
-
-function filterTests(tag, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const grid = document.getElementById('tests-grid');
-  const filtered = tag === 'all' ? TESTS_DATA : TESTS_DATA.filter(t => t.tag === tag);
-  grid.innerHTML = filtered.map(t => renderTestCard(t)).join('');
-}
-
-function renderTestCard(t) {
-  return `
-    <div class="test-lib-card" onclick="openTestModal(${JSON.stringify(t.name).replace(/'/g, '\\'')})">
-      <div class="test-lib-tag tag-${t.tag}">${t.tagLabel}</div>
-      <div class="test-lib-name">${t.name}</div>
-      <div class="test-lib-desc">${t.desc}</div>
-      <div class="test-lib-score" style="white-space:pre-line;font-size:12px;color:var(--ink2);">${t.score}</div>
-    </div>
-  `;
-}
-
-function openTestModal(name) {
-  const t = TESTS_DATA.find(t => t.name === name);
-  if (!t) return;
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal">
-      <div class="modal-header">
-        <div>
-          <span class="test-lib-tag tag-${t.tag}" style="margin-bottom:8px;display:inline-block;">${t.tagLabel}</span>
-          <div class="modal-title">${t.name}</div>
-        </div>
-        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <button 
+          onClick={nextStep} 
+          disabled={step === 5}
+          className={`p-2 rounded-full flex-shrink-0 transition-colors ${step === 5 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'}`}
+          title="Étape suivante"
+        >
+          <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
         </button>
       </div>
+    );
+  };
 
-      <p style="font-size:14px;color:var(--ink2);margin-bottom:20px;">${t.desc}</p>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
-        <div>
-          <h4 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ink3);margin-bottom:8px;">Items / Protocole</h4>
-          <ol style="padding-left:18px;display:grid;gap:4px;">
-            ${t.items.map(i => `<li style="font-size:13px;color:var(--ink2);">${i}</li>`).join('')}
-          </ol>
-        </div>
-        <div>
-          <h4 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ink3);margin-bottom:8px;">Interprétation</h4>
-          <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:14px;font-size:13px;white-space:pre-line;color:var(--ink2);border:1px solid var(--border);">${t.score}</div>
-        </div>
+  // --- VUES SECONDAIRES ET ACCUEIL ---
+  const renderHome = () => (
+    <div className="p-6 md:p-12 animate-fade-in">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl font-bold text-slate-800 mb-4">Bienvenue sur KinéBilan Pro</h2>
+        <p className="text-slate-600 max-w-2xl mx-auto">Votre assistant numérique pour la réalisation, le suivi et le partage de vos bilans diagnostics kinésithérapiques (BDK).</p>
       </div>
 
-      <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button class="btn btn-ghost" onclick="this.closest('.modal-overlay').remove()">Fermer</button>
-        <button class="btn btn-accent" onclick="addTestToBilan('${t.name}')">Ajouter au bilan en cours</button>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <button onClick={() => {setFormData(emptyForm); setStep(1); setCurrentView('new_bilan');}} className="flex flex-col items-center text-left p-8 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all group">
+          <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          </div>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">Nouveau Bilan</h3>
+          <p className="text-slate-500 text-sm text-center">Créer un nouveau BDK en suivant la trame complète structurée.</p>
+        </button>
+
+        <button onClick={triggerImport} className="flex flex-col items-center text-left p-8 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-400 transition-all group">
+          <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+          </div>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">Reprendre un Bilan</h3>
+          <p className="text-slate-500 text-sm text-center">Importer un fichier (.json) pour reprendre ou consulter un bilan.</p>
+        </button>
+
+        <button onClick={() => navigateTo('suivi')} className="flex flex-col items-center text-left p-8 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-green-400 transition-all group">
+          <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          </div>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">Suivi de Bilan</h3>
+          <p className="text-slate-500 text-sm text-center">Réévaluer l'évolution d'un patient en cours de traitement.</p>
+        </button>
+
+        <button onClick={() => navigateTo('courrier')} className="flex flex-col items-center text-left p-8 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-orange-400 transition-all group">
+          <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+          </div>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">Courrier au médecin</h3>
+          <p className="text-slate-500 text-sm text-center">Générer automatiquement une synthèse formelle pour le médecin.</p>
+        </button>
+
+        <button onClick={() => navigateTo('tests')} className="flex flex-col items-center text-left p-8 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-cyan-400 transition-all group">
+          <div className="w-16 h-16 bg-cyan-100 text-cyan-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          </div>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">Bibliothèque Tests</h3>
+          <p className="text-slate-500 text-sm text-center">Fiches explicatives, protocoles de passation et grilles de cotation.</p>
+        </button>
+
+        <button onClick={() => navigateTo('ressources')} className="flex flex-col items-center text-left p-8 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-teal-400 transition-all group">
+          <div className="w-16 h-16 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          </div>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">Ressources & ETP</h3>
+          <p className="text-slate-500 text-sm text-center">Fiches d'éducation Fullphysio, supports visuels et gestion de la charge.</p>
+        </button>
       </div>
     </div>
-  `;
-  document.body.appendChild(modal);
-}
+  );
 
-function addTestToBilan(name) {
-  document.querySelector('.modal-overlay')?.remove();
-  if (!currentBilan) { currentBilan = EMPTY_BILAN(); }
-  if (!currentBilan.visualTests) currentBilan.visualTests = [];
-  currentBilan.visualTests.push({ id: Date.now().toString(), name, bgImage: null, drawData: null });
-  currentStep = 3;
-  showPage('bilan');
-  toast(`✓ "${name}" ajouté au bilan`);
-}
+  const renderSuivi = () => (
+    <div className="animate-fade-in max-w-4xl mx-auto space-y-6">
+      <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+        <div className="text-green-500 mb-6"><svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></div>
+        <h2 className="text-2xl font-bold mb-2">Module de Suivi</h2>
+        <p className="text-slate-600 mb-8">Réévaluez l'évolution du patient sans refaire tout le BDK initial.</p>
+        
+        <div className="space-y-6">
+          <div className="p-5 border border-dashed border-slate-300 rounded-xl">
+            <h3 className="font-semibold text-slate-800 mb-3">Importer un document de suivi</h3>
+            <p className="text-sm text-slate-500 mb-4">Vous pouvez importer vos propres fiches de suivi, grilles PDF, Word ou images ici.</p>
+            
+            <label className="cursor-pointer px-4 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded hover:bg-slate-50 shadow-sm inline-flex items-center">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+              Parcourir (PDF, Docx, JPEG...)
+              <input type="file" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" className="hidden" onChange={(e) => setImportedSuivi(prev => [...prev, ...Array.from(e.target.files).map(f => ({ name: f.name }))])} />
+            </label>
 
-// ===== UTILS =====
-function esc(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
+            {importedSuivi.length > 0 && (
+              <ul className="mt-4 space-y-2">
+                {importedSuivi.map((file, i) => (
+                  <li key={i} className="text-sm text-slate-700 bg-slate-100 px-3 py-2 rounded flex items-center">
+                    <svg className="w-4 h-4 mr-2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    {file.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
-// ===== PWA SERVICE WORKER =====
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
+  const renderTests = () => (
+    <div className="animate-fade-in max-w-4xl mx-auto space-y-6">
+      <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+        <div className="text-cyan-500 mb-6"><svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg></div>
+        <h2 className="text-2xl font-bold mb-2">Bibliothèque de Tests & Import</h2>
+        <p className="text-slate-600 mb-8">Accédez aux tests validés ou importez votre propre base de données documentaire.</p>
+        
+        <div className="space-y-6">
+          <div className="p-5 border border-dashed border-slate-300 rounded-xl">
+            <h3 className="font-semibold text-slate-800 mb-3">Importer vos propres tests (PDF, Docx...)</h3>
+            <label className="cursor-pointer px-4 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded hover:bg-slate-50 shadow-sm inline-flex items-center">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+              Ajouter un document
+              <input type="file" multiple accept=".pdf,.doc,.docx,.jpg,.png" className="hidden" onChange={(e) => setImportedTestsLib(prev => [...prev, ...Array.from(e.target.files).map(f => ({ name: f.name }))])} />
+            </label>
 
-// ===== INIT =====
-openDB().then(() => {
-  showPage('home');
-});
-</script>
-</body>
-</html>
+            {importedTestsLib.length > 0 && (
+              <ul className="mt-4 space-y-2">
+                {importedTestsLib.map((file, i) => (
+                  <li key={i} className="text-sm text-slate-700 bg-slate-100 px-3 py-2 rounded flex items-center">
+                    <svg className="w-4 h-4 mr-2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    {file.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderRessources = () => (
+    <div className="animate-fade-in max-w-5xl mx-auto space-y-8">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-slate-800 flex items-center justify-center">
+          <svg className="w-8 h-8 mr-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          Éducation Thérapeutique & Ressources
+        </h2>
+        <p className="text-slate-600 mt-3">Banque d'infographies et supports visuels type Fullphysio.</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+          <div className="h-40 bg-teal-50 border-b border-slate-100 flex items-center justify-center"><svg className="w-16 h-16 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+          <div className="p-5">
+            <h3 className="font-bold text-slate-800 mb-1">Comprendre la Douleur</h3>
+            <p className="text-sm text-slate-500 mb-4">Modèle Bio-Psycho-Social, théorie du portillon.</p>
+            <button className="w-full py-2 bg-slate-100 text-slate-700 text-sm font-medium rounded hover:bg-slate-200">Consulter</button>
+          </div>
+        </div>
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+          <div className="h-40 bg-orange-50 border-b border-slate-100 flex items-center justify-center"><svg className="w-16 h-16 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></div>
+          <div className="p-5">
+            <h3 className="font-bold text-slate-800 mb-1">Gestion de la Charge</h3>
+            <p className="text-sm text-slate-500 mb-4">Quantification du stress mécanique, zone d'adaptation.</p>
+            <button className="w-full py-2 bg-slate-100 text-slate-700 text-sm font-medium rounded hover:bg-slate-200">Consulter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderContact = () => (
+    <div className="p-8 text-center animate-fade-in max-w-2xl mx-auto">
+      <div className="text-purple-500 mb-4 flex justify-center">
+        <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+      </div>
+      <h2 className="text-3xl font-bold mb-4 text-slate-800">Contact & Support</h2>
+      <p className="text-slate-600 mb-8 text-lg">
+        Une suggestion d'amélioration ? Un test manquant ? Contactez l'équipe pour faire évoluer l'outil.
+      </p>
+      
+      <div 
+        onClick={handleCopyEmail}
+        className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm mb-10 inline-block text-left w-full sm:w-auto relative cursor-pointer hover:border-blue-300 hover:shadow-md transition-all"
+      >
+        <p className="text-xs text-slate-400 mb-2 uppercase font-bold tracking-wider text-center sm:text-left">Email de contact (Cliquez pour copier)</p>
+        <div className="text-xl font-medium text-blue-600 hover:text-blue-800 transition-colors flex items-center justify-center sm:justify-start">
+          <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+          support@kinebilanpro.fr
+        </div>
+        {copied && (
+          <div className="absolute -top-3 -right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md animate-fade-in">
+            Copié !
+          </div>
+        )}
+      </div>
+      <br/>
+      <button 
+        onClick={() => navigateTo('home')} 
+        className="px-8 py-3 bg-slate-800 text-white font-medium rounded-xl hover:bg-slate-700 transition-colors shadow-sm inline-flex items-center"
+      >
+        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        Retour à l'accueil
+      </button>
+    </div>
+  );
+
+  const renderCourrier = () => {
+    const today = new Date().toLocaleDateString('fr-FR');
+    return (
+      <div className="animate-fade-in max-w-4xl mx-auto space-y-6">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 print:hidden">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <h2 className="text-xl font-bold text-slate-800 flex items-center">
+              <svg className="w-6 h-6 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+              Éditeur de Courrier
+            </h2>
+            <div className="flex space-x-3">
+              <button onClick={autoFillLetter} className="px-4 py-2 bg-blue-50 text-blue-600 font-medium rounded-lg hover:bg-blue-100 transition-colors border border-blue-200">
+                Générer depuis Bilan
+              </button>
+              <button onClick={() => window.print()} className="px-4 py-2 bg-slate-800 text-white font-medium rounded-lg hover:bg-slate-700 flex items-center transition-colors">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                Imprimer
+              </button>
+              <button onClick={() => generatePDF('courrier-print-area', 'Courrier')} className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 flex items-center transition-colors shadow-sm">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                Télécharger PDF
+              </button>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Médecin destinataire :</label>
+              <input type="text" name="doctorName" value={formData.doctorName} onChange={handleChange} className="w-full p-2 border border-slate-300 rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Type de bilan :</label>
+              <select name="reportType" value={formData.reportType} onChange={handleChange} className="w-full p-2 border border-slate-300 rounded bg-white">
+                <option value="INITIAL">INITIAL</option>
+                <option value="INTERMÉDIAIRE">INTERMÉDIAIRE</option>
+                <option value="FINAL">FINAL</option>
+              </select>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div className="col-span-1 md:col-span-2">
+              <label className="block text-sm font-medium text-slate-700 mb-1">Votre Nom (Kiné) :</label>
+              <input type="text" name="therapistName" value={formData.therapistName} onChange={handleChange} placeholder="Votre nom" className="w-full p-2 border border-slate-300 rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Téléphone :</label>
+              <input type="text" name="therapistPhone" value={formData.therapistPhone} onChange={handleChange} className="w-full p-2 border border-slate-300 rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Email :</label>
+              <input type="email" name="therapistEmail" value={formData.therapistEmail} onChange={handleChange} className="w-full p-2 border border-slate-300 rounded" />
+            </div>
+            <div className="col-span-1 md:col-span-4">
+              <label className="block text-sm font-medium text-slate-700 mb-1">Adresse de votre cabinet :</label>
+              <input type="text" name="therapistAddress" value={formData.therapistAddress} onChange={handleChange} className="w-full p-2 border border-slate-300 rounded" />
+            </div>
+          </div>
+          <p className="text-xs text-slate-500 italic mt-4">Astuce : Remplissez le corps de la lettre et la signature directement dans la page d'aperçu ci-dessous.</p>
+        </div>
+
+        <div id="courrier-print-area" className="bg-white p-10 md:p-16 shadow-lg rounded-sm font-sans print:shadow-none print:m-0 print:p-0">
+          <div className="flex justify-between items-start mb-12">
+            <h1 className="text-xl font-bold text-slate-800 tracking-wider">KinéBilan Pro</h1>
+            <p className="text-slate-800">Date du rapport : {today}</p>
+          </div>
+          <div className="text-center mb-10"><h2 className="text-2xl font-bold text-slate-900 border-b border-slate-800 pb-2 inline-block">RAPPORT KINÉSITHÉRAPIQUE</h2></div>
+          
+          <div className="grid grid-cols-2 gap-8 mb-8">
+            <div className="space-y-4">
+              <div><span className="font-bold text-slate-800 block">Kinésithérapeute :</span><span className="text-slate-700">{formData.therapistName || '...'}</span></div>
+              <div className="pt-4"><span className="font-bold text-slate-800 block">Patient :</span><span className="text-slate-700 font-semibold">{formData.patientName || '...'}</span></div>
+            </div>
+            <div className="space-y-4">
+              <div><span className="font-bold text-slate-800 block">À l'attention du Dr :</span><span className="text-slate-700 font-semibold">{formData.doctorName || '...'}</span></div>
+              <div className="pt-4"><span className="font-bold text-slate-800 block">Motif :</span><span className="text-slate-700">{formData.motif || '...'}</span></div>
+            </div>
+          </div>
+
+          <div className="mb-8 flex items-center space-x-6">
+            <span className="font-bold text-slate-800 uppercase text-sm">Type de bilan :</span>
+            <div className="flex space-x-6">
+              <label className="flex items-center space-x-2">
+                <input type="checkbox" readOnly checked={formData.reportType === 'INITIAL'} className="w-4 h-4 accent-slate-800" />
+                <span className="text-sm">INITIAL</span>
+              </label>
+              <label className="flex items-center space-x-2">
+                <input type="checkbox" readOnly checked={formData.reportType === 'INTERMÉDIAIRE'} className="w-4 h-4 accent-slate-800" />
+                <span className="text-sm">INTERMÉDIAIRE</span>
+              </label>
+              <label className="flex items-center space-x-2">
+                <input type="checkbox" readOnly checked={formData.reportType === 'FINAL'} className="w-4 h-4 accent-slate-800" />
+                <span className="text-sm">FINAL</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-bold text-slate-800 uppercase mb-2">Observations & Évaluation :</h3>
+              <textarea name="letterObservations" value={formData.letterObservations} onChange={handleChange} rows="4" className="w-full text-slate-700 resize-none border-0 focus:ring-0 p-0 bg-transparent print:overflow-hidden" placeholder="..."/>
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-800 uppercase mb-2">Objectifs & Prise en charge :</h3>
+              <textarea name="letterObjectifs" value={formData.letterObjectifs} onChange={handleChange} rows="4" className="w-full text-slate-700 resize-none border-0 focus:ring-0 p-0 bg-transparent print:overflow-hidden" placeholder="..."/>
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-800 uppercase mb-2">Évolution & Synthèse :</h3>
+              <textarea name="letterSynthese" value={formData.letterSynthese} onChange={handleChange} rows="3" className="w-full text-slate-700 resize-none border-0 focus:ring-0 p-0 bg-transparent print:overflow-hidden" placeholder="..."/>
+            </div>
+          </div>
+
+          <div className="mt-12 pt-8 border-t border-slate-200">
+            <div className="grid grid-cols-2 gap-8 text-sm">
+              <div className="space-y-1 text-slate-600">
+                <p><span className="font-bold text-slate-800">Email :</span> {formData.therapistEmail || '...'}</p>
+                <p><span className="font-bold text-slate-800">Téléphone :</span> {formData.therapistPhone || '...'}</p>
+                <p><span className="font-bold text-slate-800">Adresse cabinet :</span> {formData.therapistAddress || '...'}</p>
+              </div>
+              <div className="text-right flex flex-col items-end">
+                <span className="font-bold text-slate-800 mb-2 block">Signature du kinésithérapeute :</span>
+                <input type="text" name="therapistSignature" value={formData.therapistSignature} onChange={handleChange} placeholder="Taper pour signer..." className="w-64 text-right text-slate-800 italic font-serif text-lg bg-transparent border-0 border-b border-dashed border-slate-400 focus:ring-0 print:border-none p-1" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col">
+      <input type="file" accept=".json" ref={fileInputRef} className="hidden" onChange={handleImportData} />
+
+      <header className="bg-slate-900 text-white sticky top-0 z-50 print:hidden shadow-md">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center cursor-pointer" onClick={() => navigateTo('home')}>
+              <svg className="w-8 h-8 mr-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+              <span className="text-xl font-bold tracking-tight">KinéBilan Pro</span>
+            </div>
+            <div className="relative">
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-slate-800">
+                <span className="hidden sm:block text-sm font-medium">Menu</span>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"></path></svg>
+              </button>
+              {isMenuOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50 overflow-hidden">
+                  <button onClick={() => navigateTo('home')} className="block w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50">Accueil</button>
+                  <button onClick={startNewBilan} className="block w-full text-left px-4 py-3 text-sm text-blue-600 font-medium hover:bg-blue-50">Nouveau Bilan</button>
+                  <button onClick={triggerImport} className="block w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50">Reprendre un Bilan</button>
+                  <div className="border-t border-slate-100"></div>
+                  <button onClick={() => navigateTo('suivi')} className="block w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50">Suivi de Bilan</button>
+                  <button onClick={() => navigateTo('courrier')} className="block w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50">Courrier au médecin</button>
+                  <div className="border-t border-slate-100"></div>
+                  <button onClick={() => navigateTo('tests')} className="block w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50">Bibliothèque de Tests</button>
+                  <button onClick={() => navigateTo('ressources')} className="block w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50">Ressources & ETP</button>
+                  <button onClick={() => navigateTo('contact')} className="block w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50">Contact / Support</button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-1 p-4 md:p-8">
+        {currentView === 'home' && renderHome()}
+        {currentView === 'suivi' && renderSuivi()}
+        {currentView === 'courrier' && renderCourrier()}
+        {currentView === 'tests' && renderTests()}
+        {currentView === 'ressources' && renderRessources()}
+        {currentView === 'contact' && renderContact()}
+
+        {currentView === 'new_bilan' && (
+          <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div className="p-6 md:p-8">
+              {renderProgressBar()}
+
+              {(formData.redFlag1 || formData.redFlag2) && step < 5 && (
+                <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded flex items-start print:hidden">
+                  <svg className="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                  <div>
+                    <p className="font-bold">Alerte Drapeau Rouge (Réorientation médicale conseillée)</p>
+                    <p className="text-sm mt-1">L'évaluation indique un risque de pathologie grave nécessitant un avis médical.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* ETAPE 1 */}
+              {step === 1 && (
+                <div className="space-y-8 animate-fade-in">
+                  <h2 className="text-xl font-bold text-slate-800 border-b pb-2">Phase 1 : Anamnèse et Contexte</h2>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Nom du patient</label>
+                      <input type="text" name="patientName" value={formData.patientName} onChange={handleChange} className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Âge</label>
+                      <input type="number" name="age" value={formData.age} onChange={handleChange} className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Motif de consultation</label>
+                    <textarea name="motif" value={formData.motif} onChange={handleChange} rows="2" className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500"></textarea>
+                  </div>
+
+                  <div className="bg-blue-50/50 p-5 rounded-xl border border-blue-100">
+                    <h3 className="font-semibold text-blue-900 mb-3 flex items-center">
+                      <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                      Attentes & Objectifs
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                      <div><label className="block text-sm text-slate-600 mb-1 font-medium">Court Terme</label><textarea name="objectifsCT" value={formData.objectifsCT} onChange={handleChange} rows="2" className="w-full p-2 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-blue-500" /></div>
+                      <div><label className="block text-sm text-slate-600 mb-1 font-medium">Moyen Terme</label><textarea name="objectifsMT" value={formData.objectifsMT} onChange={handleChange} rows="2" className="w-full p-2 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-blue-500" /></div>
+                      <div><label className="block text-sm text-slate-600 mb-1 font-medium">Long Terme</label><textarea name="objectifsLT" value={formData.objectifsLT} onChange={handleChange} rows="2" className="w-full p-2 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-blue-500" /></div>
+                    </div>
+                    <div className="pt-3 border-t border-blue-100">
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Date ou jalon de réévaluation cible :</label>
+                      <input type="text" name="dureeReeval" value={formData.dureeReeval} onChange={handleChange} className="w-full md:w-1/2 p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500" />
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                    <h3 className="font-semibold text-slate-800 mb-4">Sémiologie de la douleur</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Type et rythme (Méca/Inflam)</label>
+                        <input type="text" name="douleurType" value={formData.douleurType} onChange={handleChange} className="w-full p-2 border border-slate-300 rounded" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Intensité (EVA) : <span className="text-red-600 font-bold">{formData.eva}/10</span></label>
+                        <input type="range" name="eva" min="0" max="10" value={formData.eva} onChange={handleChange} className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                      </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-slate-200 flex flex-col items-center">
+                      <div className="w-full mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                          <h4 className="font-medium text-slate-800 mb-1">Body Chart (Localisation & Irradiations)</h4>
+                          <p className="text-sm text-slate-500">Gribouillez directement sur le schéma avec votre doigt ou la souris.</p>
+                        </div>
+                        <label className="cursor-pointer bg-white border border-slate-300 text-slate-700 text-sm py-2 px-3 rounded-lg hover:bg-slate-50 shadow-sm transition-colors flex items-center">
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                          Changer le fond
+                          <input type="file" accept="image/*" className="hidden" onChange={handleBgUpload} />
+                        </label>
+                      </div>
+                      <DrawableCanvas 
+                        initialData={formData.bodyChartData} 
+                        bgImage={formData.bodyChartBg}
+                        aspectRatioClass="aspect-[4/3]"
+                        onChange={(data) => setFormData(prev => ({ ...prev, bodyChartData: data }))} 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-red-50 p-5 rounded-xl border border-red-100">
+                      <label className="flex items-center space-x-3 text-red-700 font-semibold mb-2 cursor-pointer">
+                        <input type="checkbox" name="redFlag1" checked={formData.redFlag1} onChange={handleChange} className="w-5 h-5 text-red-600 rounded focus:ring-red-500" />
+                        <span>Drapeaux Rouges (Anamnèse) ?</span>
+                      </label>
+                      {formData.redFlag1 && (
+                        <input type="text" name="redFlag1Details" value={formData.redFlag1Details} onChange={handleChange} placeholder="Précisez (ex: perte de poids...)" className="w-full p-2 text-sm border border-red-300 rounded mt-2 focus:ring-2 focus:ring-red-500" />
+                      )}
+                    </div>
+                    <div className="bg-yellow-50 p-5 rounded-xl border border-yellow-100">
+                      <label className="block text-yellow-800 font-semibold mb-2">Drapeaux Jaunes (BPS)</label>
+                      <input type="text" name="yellowFlags" value={formData.yellowFlags} onChange={handleChange} placeholder="Peurs, croyances, stress..." className="w-full p-2 text-sm border border-yellow-300 rounded focus:ring-2 focus:ring-yellow-500" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ETAPE 2 */}
+              {step === 2 && (
+                <div className="space-y-6 animate-fade-in">
+                  <h2 className="text-xl font-bold text-slate-800 border-b pb-2">Phase 2 : Raisonnement Clinique</h2>
+                  <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                    <div className="mb-5">
+                      <label className="block text-sm font-bold text-blue-900 mb-2">Hypothèse Principale (H1)</label>
+                      <textarea name="hypothesePrincipale" value={formData.hypothesePrincipale} onChange={handleChange} rows="3" className="w-full p-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ex: Lombosciatique L5..."></textarea>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-blue-800 mb-2">Diagnostics Différentiels (H2, H3)</label>
+                      <textarea name="diagnosticsDifferentiels" value={formData.diagnosticsDifferentiels} onChange={handleChange} rows="2" className="w-full p-3 border border-blue-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ETAPE 3 */}
+              {step === 3 && (
+                <div className="space-y-6 animate-fade-in">
+                  <h2 className="text-xl font-bold text-slate-800 border-b pb-2">Phase 3 : Examen Clinique</h2>
+                  <div className="space-y-5">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Observation & Palpation</label>
+                      <textarea name="observation" value={formData.observation} onChange={handleChange} rows="2" className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Bilan Articulaire & Musculaire</label>
+                      <textarea name="bilanArticulaire" value={formData.bilanArticulaire} onChange={handleChange} rows="2" className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Bilan Neurologique</label>
+                      <textarea name="bilanNeuro" value={formData.bilanNeuro} onChange={handleChange} rows="2" className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                    
+                    <div className="bg-slate-100 p-5 rounded-xl border border-slate-200">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 mb-4">
+                        <div className="flex-1 w-full">
+                          <label className="block text-sm font-bold text-slate-800 mb-1">Espaces de tests (Grilles visuelles annotables)</label>
+                          <select 
+                            value={selectedTestToAdd} 
+                            onChange={(e) => setSelectedTestToAdd(e.target.value)} 
+                            className="w-full p-2 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
+                          >
+                            {standardTests.map(t => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                          
+                          {selectedTestToAdd === "Autre..." && (
+                            <input 
+                              type="text" 
+                              value={customTestName}
+                              onChange={(e) => setCustomTestName(e.target.value)}
+                              placeholder="Nom du test personnalisé..."
+                              className="w-full mt-2 p-2 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
+                            />
+                          )}
+                        </div>
+                        <button 
+                          type="button" 
+                          onClick={handleAddVisualTest} 
+                          className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 whitespace-nowrap shadow-sm"
+                        >
+                          + Ajouter l'espace de test
+                        </button>
+                      </div>
+
+                      {formData.visualTests && formData.visualTests.map(test => (
+                        <div key={test.id} className="mt-8 p-4 bg-white border border-slate-300 rounded-xl shadow-sm">
+                          <div className="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
+                            <h4 className="font-bold text-lg text-blue-900">{test.name}</h4>
+                            <button onClick={() => removeVisualTest(test.id)} className="text-red-500 hover:text-red-700 text-xs font-bold uppercase">Retirer</button>
+                          </div>
+                          
+                          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
+                             <p className="text-sm text-slate-500">Tracez les résultats directement sur cette grille.</p>
+                             <label className="cursor-pointer bg-slate-100 border border-slate-300 text-slate-700 text-xs py-1.5 px-3 rounded hover:bg-slate-200 transition-colors flex items-center shadow-sm">
+                              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                              Importer votre grille (Image/Capture)
+                              <input type="file" accept="image/*" className="hidden" onChange={(e) => updateVisualTestBg(e, test.id)} />
+                            </label>
+                          </div>
+
+                          <DrawableCanvas 
+                            initialData={test.drawData}
+                            bgImage={test.bgImage}
+                            aspectRatioClass="aspect-[3/4]"
+                            canvasWidth={600}
+                            canvasHeight={800}
+                            onChange={(data) => updateVisualTestDraw(test.id, data)}
+                          />
+                        </div>
+                      ))}
+
+                      <div className="mt-6 pt-4 border-t border-slate-300">
+                        <label className="block text-sm text-slate-600 mb-1 font-semibold">Notes textuelles brèves (facultatif) :</label>
+                        <textarea 
+                          name="testsSpecifiques" 
+                          value={formData.testsSpecifiques} 
+                          onChange={handleChange} 
+                          rows="2" 
+                          className="w-full p-2 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-blue-500" 
+                          placeholder="Ex: TUG = 12s..."
+                        ></textarea>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div className="bg-red-50 p-5 rounded-xl border border-red-200 mt-8 shadow-sm">
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 pt-0.5">
+                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                      </div>
+                      <div className="ml-3 w-full">
+                        <label className="flex items-center space-x-2 text-red-800 font-bold mb-1 cursor-pointer">
+                          <input type="checkbox" name="redFlag2" checked={formData.redFlag2} onChange={handleChange} className="w-5 h-5 text-red-600 rounded focus:ring-red-500" />
+                          <span>Drapeaux Rouges à l'examen clinique ?</span>
+                        </label>
+                        {formData.redFlag2 && (
+                          <input type="text" name="redFlag2Details" value={formData.redFlag2Details} onChange={handleChange} placeholder="Précisez la découverte..." className="w-full p-2 text-sm border border-red-300 rounded mt-1 focus:ring-2 focus:ring-red-500" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ETAPE 4 */}
+              {step === 4 && (
+                <div className="space-y-6 animate-fade-in">
+                  <h2 className="text-xl font-bold text-slate-800 border-b pb-2">Phase 4 : Décision & Conclusion</h2>
+                  <div className="mb-8">
+                    <label className="block text-lg font-bold text-slate-800 mb-4 text-center">Votre Hypothèse Principale (H1) est-elle confirmée ?</label>
+                    <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 max-w-lg mx-auto">
+                      <button onClick={() => setFormData({...formData, hypotheseConfirmee: true})} className={`flex-1 py-4 px-6 rounded-xl border-2 font-bold text-lg transition-all ${formData.hypotheseConfirmee === true ? 'bg-green-100 border-green-500 text-green-700 shadow-md' : 'bg-white border-slate-200 text-slate-500 hover:border-green-300 hover:bg-green-50'}`}>OUI !</button>
+                      <button onClick={() => setFormData({...formData, hypotheseConfirmee: false})} className={`flex-1 py-4 px-6 rounded-xl border-2 font-bold text-lg transition-all ${formData.hypotheseConfirmee === false ? 'bg-slate-100 border-slate-500 text-slate-700 shadow-md' : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'}`}>NON !</button>
+                    </div>
+                  </div>
+                  {formData.hypotheseConfirmee === true && (
+                    <div className="bg-green-50 p-6 rounded-xl border border-green-200 animate-fade-in">
+                      <h3 className="font-bold text-lg text-green-800 mb-3 flex items-center">Prise En Charge (PEC) & Projet Thérapeutique</h3>
+                      <textarea name="planTraitement" value={formData.planTraitement} onChange={handleChange} rows="4" className="w-full p-3 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 shadow-sm"></textarea>
+                    </div>
+                  )}
+                  {formData.hypotheseConfirmee === false && (
+                    <div className="bg-slate-100 p-6 rounded-xl border border-slate-300 animate-fade-in">
+                      <h3 className="font-bold text-lg text-slate-800 mb-3 flex items-center">Remise en question de l'hypothèse</h3>
+                      <textarea name="reorientation" value={formData.reorientation} onChange={handleChange} rows="4" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 shadow-sm"></textarea>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ETAPE 5 : RÉSUMÉ & ACTIONS FINALES */}
+              {step === 5 && (
+                <div className="space-y-6 animate-fade-in">
+                  <div className="flex flex-col sm:flex-row justify-between items-center border-b pb-4 print:hidden gap-4">
+                    <h2 className="text-xl font-bold text-slate-800">Aperçu du BDK</h2>
+                    <div className="flex space-x-3">
+                      <button onClick={handleExportData} className="px-4 py-2 bg-indigo-100 text-indigo-700 font-medium rounded-lg hover:bg-indigo-200 flex items-center shadow-sm">
+                        Sauvegarder (.json)
+                      </button>
+                      <button onClick={() => window.print()} className="px-4 py-2 bg-slate-800 text-white font-medium rounded-lg hover:bg-slate-700 flex items-center shadow-sm">
+                        Imprimer
+                      </button>
+                      <button onClick={() => generatePDF('bilan-print-area', 'Bilan')} className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 flex items-center shadow-sm">
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        Télécharger PDF
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* ZONE IMPRIMABLE */}
+                  <div id="bilan-print-area" className="bg-white border border-slate-200 p-8 rounded-xl shadow-sm font-serif print:shadow-none print:border-none print:p-0">
+                    <div className="mb-6 pb-4 border-b-2 border-slate-800">
+                      <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Bilan Diagnostic Kinésithérapique</h1>
+                      <p className="text-lg text-slate-700">Patient(e) : <span className="font-bold text-black">{formData.patientName || 'Non renseigné'}</span> {formData.age ? `(${formData.age} ans)` : ''}</p>
+                    </div>
+
+                    <div className="mb-6"><h3 className="text-lg font-bold text-slate-800 mb-2 border-b border-slate-200 pb-1">1. Motif & Objectifs</h3><p className="mb-4 text-slate-800"><span className="font-semibold text-slate-600">Motif :</span> {formData.motif || '-'}</p><div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200"><div><span className="font-bold text-blue-800 block mb-1">Court Terme :</span>{formData.objectifsCT || '-'}</div><div><span className="font-bold text-blue-800 block mb-1">Moyen Terme :</span>{formData.objectifsMT || '-'}</div><div><span className="font-bold text-blue-800 block mb-1">Long Terme :</span>{formData.objectifsLT || '-'}</div></div><p className="mt-3 text-sm text-slate-700 italic"><span className="font-semibold">Cible de réévaluation :</span> {formData.dureeReeval || 'Non définie'}</p></div>
+
+                    <div className="mb-6"><h3 className="text-lg font-bold text-slate-800 mb-2 border-b border-slate-200 pb-1">2. Sémiologie & Localisation</h3><div className="flex flex-col md:flex-row md:space-x-8"><div className="flex-1 space-y-2"><p><span className="font-semibold text-slate-600">Type :</span> {formData.douleurType || '-'}</p><p><span className="font-semibold text-slate-600">Intensité :</span> <span className="font-bold text-red-600 bg-red-50 px-2 py-1 rounded">EVA {formData.eva}/10</span></p></div>{formData.bodyChartData && (<div className="mt-4 md:mt-0 w-full max-w-sm"><p className="text-sm font-semibold text-slate-600 mb-2">Cartographie :</p><div className="relative border border-slate-300 rounded overflow-hidden bg-white w-full aspect-[4/3]"><img src={formData.bodyChartBg} className="absolute inset-0 w-full h-full object-contain opacity-40" alt="Fond" /><img src={formData.bodyChartData} alt="Dessin" className="absolute inset-0 w-full h-full object-contain" /></div></div>)}</div></div>
+
+                    {(formData.redFlag1 || formData.redFlag2 || formData.yellowFlags) && (<div className="mb-6 p-4 bg-red-50/50 border border-red-200 rounded-lg break-inside-avoid"><h3 className="font-bold text-red-800 mb-2">Points de vigilance (Drapeaux) :</h3>{formData.redFlag1 && <p className="text-red-700 font-medium mb-1">🚩 Anamnèse : {formData.redFlag1Details}</p>}{formData.redFlag2 && <p className="text-red-700 font-medium mb-1">🚩 Clinique : {formData.redFlag2Details}</p>}{formData.yellowFlags && <p className="text-yellow-700 font-medium">🔸 Facteurs BPS : {formData.yellowFlags}</p>}</div>)}
+
+                    <div className="mb-6 break-inside-avoid"><h3 className="text-lg font-bold text-slate-800 mb-2 border-b border-slate-200 pb-1">3. Hypothèse Diagnostique</h3><p className="text-blue-900 font-medium p-3 bg-blue-50 rounded-lg">{formData.hypothesePrincipale || 'Non formulée'}</p></div>
+
+                    <div className="mb-6 break-inside-avoid">
+                      <h3 className="text-lg font-bold text-slate-800 mb-2 border-b border-slate-200 pb-1">4. Examen Clinique</h3>
+                      <div className="space-y-3 bg-slate-50 p-4 rounded-lg text-slate-800">
+                        <p><strong>Observation :</strong> {formData.observation || '-'}</p>
+                        <p><strong>Bilan Articulaire/Musculaire :</strong> {formData.bilanArticulaire || '-'}</p>
+                        <p><strong>Bilan Neurologique :</strong> {formData.bilanNeuro || '-'}</p>
+                        {formData.testsSpecifiques && <p className="whitespace-pre-wrap"><strong>Notes sur les Tests Spécifiques :</strong><br/>{formData.testsSpecifiques}</p>}
+                      </div>
+                    </div>
+
+                    <div className="mt-8 pt-6 border-t-2 border-slate-800 break-inside-avoid"><h3 className="text-xl font-bold text-slate-900 mb-3">Conclusion & Décision :</h3>{formData.hypotheseConfirmee === true ? (<div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg"><p className="font-bold text-green-800 text-lg mb-2">✅ Hypothèse Confirmée</p><p className="font-semibold text-slate-700">Projet Thérapeutique & Traitement :</p><p className="mt-1 text-slate-800 whitespace-pre-wrap">{formData.planTraitement || '-'}</p></div>) : formData.hypotheseConfirmee === false ? (<div className="bg-slate-100 border-l-4 border-slate-500 p-4 rounded-r-lg"><p className="font-bold text-slate-800 text-lg mb-2">❌ Hypothèse Non Confirmée</p><p className="font-semibold text-slate-700">Action entreprise :</p><p className="mt-1 text-slate-800 whitespace-pre-wrap">{formData.reorientation || '-'}</p></div>) : (<p className="text-slate-500 italic">Bilan en cours, non statué.</p>)}</div>
+                    
+                    {formData.visualTests && formData.visualTests.length > 0 && (
+                      <div className="mt-12 pt-8 border-t-2 border-slate-800">
+                        <h3 className="text-xl font-bold text-slate-900 mb-6 uppercase text-center bg-slate-100 p-2">Annexes : Grilles d'évaluation</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          {formData.visualTests.map((test) => (
+                            <div key={test.id} className="break-inside-avoid flex flex-col items-center">
+                              <p className="font-bold text-slate-800 mb-3 text-lg border-b-2 border-blue-500 pb-1">{test.name}</p>
+                              <div className="relative border border-slate-300 rounded shadow-sm overflow-hidden bg-white w-full max-w-sm aspect-[3/4]">
+                                {test.bgImage ? (
+                                  <img src={test.bgImage} className="absolute inset-0 w-full h-full object-contain opacity-70" alt="Grille vierge" />
+                                ) : (
+                                  <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-slate-50 text-slate-300 italic text-sm">Espace vierge</div>
+                                )}
+                                {test.drawData && (
+                                  <img src={test.drawData} alt="Annotations" className="absolute inset-0 w-full h-full object-contain" />
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-8 pt-6 border-t border-slate-200 flex justify-between print:hidden">
+                <button onClick={prevStep} disabled={step === 1} className={`px-6 py-2.5 rounded-lg font-medium transition-colors ${step === 1 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-sm'}`}>Retour</button>
+                {step < 5 ? (
+                  <button onClick={nextStep} className="px-6 py-2.5 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition-colors">Suivant</button>
+                ) : (
+                  <button onClick={startNewBilan} className="px-6 py-2.5 rounded-lg font-medium bg-green-600 text-white hover:bg-green-700 shadow-sm transition-colors">Fermer / Nouveau Bilan</button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
